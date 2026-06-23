@@ -1,0 +1,139 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id              String          @id @default(uuid())
+  email           String          @unique
+  displayName     String
+  passwordHash    String
+  avatarUrl       String?
+  giftNote        String?
+  themePreference ThemePreference @default(NORTH_POLE)
+
+  giftLists              GiftList[]
+  giftItems              GiftItem[]
+  giftClaims             GiftClaim[] @relation("PurchaserClaims")
+  connectionsAsA         UserConnection[] @relation("UserAConnections")
+  connectionsAsB         UserConnection[] @relation("UserBConnections")
+  requestedConnections   UserConnection[] @relation("RequestedConnections")
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model UserConnection {
+  id            String           @id @default(uuid())
+
+  userAId       String
+  userBId       String
+  requestedById String
+
+  userA         User             @relation("UserAConnections", fields: [userAId], references: [id])
+  userB         User             @relation("UserBConnections", fields: [userBId], references: [id])
+  requestedBy   User             @relation("RequestedConnections", fields: [requestedById], references: [id])
+
+  status        ConnectionStatus @default(PENDING)
+
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@unique([userAId, userBId])
+}
+
+model GiftList {
+  id          String     @id @default(uuid())
+  ownerId     String
+
+  owner       User       @relation(fields: [ownerId], references: [id])
+
+  title       String
+  description String?
+  occasion    String?
+  isDefault   Boolean    @default(false)
+
+  items       GiftItem[]
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model GiftItem {
+  id              String            @id @default(uuid())
+
+  listId          String
+  ownerId         String
+
+  list            GiftList          @relation(fields: [listId], references: [id])
+  owner           User              @relation(fields: [ownerId], references: [id])
+
+  itemName        String
+  itemLink        String?
+  itemDescription String?
+  quantity        Int               @default(1)
+  isActive        Boolean           @default(true)
+
+  alternatives    GiftAlternative[]
+  claims          GiftClaim[]
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model GiftAlternative {
+  id          String   @id @default(uuid())
+
+  giftItemId  String
+  giftItem    GiftItem @relation(fields: [giftItemId], references: [id])
+
+  name        String
+  link        String?
+  description String?
+  sortOrder   Int      @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model GiftClaim {
+  id              String       @id @default(uuid())
+
+  giftItemId      String
+  purchaserId     String
+
+  giftItem        GiftItem     @relation(fields: [giftItemId], references: [id])
+  purchaser       User         @relation("PurchaserClaims", fields: [purchaserId], references: [id])
+
+  quantityClaimed Int          @default(1)
+  status          ClaimStatus  @default(RESERVED)
+  note            String?
+  purchasedAt     DateTime?
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+enum ThemePreference {
+  NORTH_POLE
+  REBEL_ALLIANCE
+  SWIFTIE_ERA
+  WINTER_FROST
+}
+
+enum ConnectionStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  BLOCKED
+}
+
+enum ClaimStatus {
+  RESERVED
+  PURCHASED
+  CANCELLED
+}
