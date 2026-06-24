@@ -1,0 +1,17 @@
+services:
+  gift-ledger-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gift-ledger-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "3002:3001"
+    networks:
+      - homelab-apps
+
+networks:
+  homelab-apps:
+    external: true
