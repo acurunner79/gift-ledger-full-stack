@@ -16,6 +16,9 @@ import { settingsRouter } from "./routes/settings.routes.js";
 import { themeRouter } from "./routes/theme.routes.js";
 
 const app = express();
+
+app.set("trust proxy", 1);
+
 const PORT = process.env.PORT || 3001;
 
 const allowedOrigins = (process.env.FRONTEND_ORIGIN || "http://localhost:5173")
