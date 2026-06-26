@@ -1497,3 +1497,23 @@ select:disabled {
   font-size: 0.85rem;
   margin-top: -6px;
 }
+
+.list-detail-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.list-detail-stack > .settings-card,
+.list-detail-stack > .preview-table-card {
+  width: 100%;
+}
+
+.add-item-panel {
+  min-height: auto;
+}
+
+.gift-ideas-panel {
+  width: 100%;
+}

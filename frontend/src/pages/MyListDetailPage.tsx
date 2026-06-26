@@ -372,8 +372,8 @@ export function MyListDetailPage() {
         </div>
       )}
 
-      <section className="settings-grid">
-        <form className="settings-card" onSubmit={handleCreateGiftItem}>
+      <section className="list-detail-stack">
+        <form className="settings-card add-item-panel" onSubmit={handleCreateGiftItem}>
           <p className="section-label">Add Item</p>
           <h2>New gift idea</h2>
           <p>
@@ -510,7 +510,7 @@ export function MyListDetailPage() {
           </button>
         </form>
 
-        <section className="preview-table-card connected-list-card">
+        <section className="preview-table-card connected-list-card gift-ideas-panel">
           <div className="table-header">
             <div>
               <p className="section-label">Gift Ideas</p>
