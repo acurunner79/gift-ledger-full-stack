@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { useState } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { appThemes } from "../themes";
@@ -6,6 +7,7 @@ import { appThemes } from "../themes";
 export function AppLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const activeTheme =
     appThemes.find((theme) => theme.key === user?.themePreference) ??
@@ -31,62 +33,86 @@ export function AppLayout() {
     navigate("/login");
   }
 
+  function closeMobileMenu() {
+    setIsMobileMenuOpen(false);
+  }
+
+  function navLinkClass({ isActive }: { isActive: boolean }) {
+    return isActive ? "nav-link active" : "nav-link";
+  }
+
   return (
     <div className="app-shell" style={themeStyle}>
       <header className="app-nav">
-        <Link className="app-brand" to="/dashboard">
-          <span className="app-brand-mark">GL</span>
-          <span>Gift Ledger</span>
-        </Link>
-
-        <nav className="app-nav-links" aria-label="Main navigation">
-          <NavLink
+        <div className="app-nav-brand-row">
+          <Link
+            className="app-brand"
             to="/dashboard"
-            className={({ isActive }) =>
-              isActive ? "app-nav-link active" : "app-nav-link"
-            }
+            onClick={closeMobileMenu}
           >
-            Dashboard
-          </NavLink>
-
-          <NavLink
-            to="/lists"
-            className={({ isActive }) =>
-              isActive ? "app-nav-link active" : "app-nav-link"
-            }
-          >
-            My Lists
-          </NavLink>
-
-          <NavLink
-            to="/connections"
-            className={({ isActive }) =>
-              isActive ? "app-nav-link active" : "app-nav-link"
-            }
-          >
-            Connections
-          </NavLink>
-
-          <NavLink
-            to="/settings"
-            className={({ isActive }) =>
-              isActive ? "app-nav-link active" : "app-nav-link"
-            }
-          >
-            Settings
-          </NavLink>
-        </nav>
-
-        <div className="app-nav-user">
-          <span>{user?.displayName || "User"}</span>
+            <span className="brand-mark">GL</span>
+            <span>Gift Ledger</span>
+          </Link>
 
           <button
             type="button"
-            className="nav-logout-button secondary-button"
-            onClick={handleLogout}
+            className="mobile-menu-toggle"
+            aria-label="Toggle navigation menu"
+            aria-expanded={isMobileMenuOpen}
+            onClick={() => setIsMobileMenuOpen((current) => !current)}
           >
-            Logout
+            <span />
+            <span />
+            <span />
           </button>
+        </div>
+
+        <div className={isMobileMenuOpen ? "app-nav-menu open" : "app-nav-menu"}>
+          <nav className="nav-links" aria-label="Main navigation">
+            <NavLink
+              to="/dashboard"
+              className={navLinkClass}
+              onClick={closeMobileMenu}
+            >
+              Dashboard
+            </NavLink>
+
+            <NavLink
+              to="/lists"
+              className={navLinkClass}
+              onClick={closeMobileMenu}
+            >
+              My Lists
+            </NavLink>
+
+            <NavLink
+              to="/connections"
+              className={navLinkClass}
+              onClick={closeMobileMenu}
+            >
+              Connections
+            </NavLink>
+
+            <NavLink
+              to="/settings"
+              className={navLinkClass}
+              onClick={closeMobileMenu}
+            >
+              Settings
+            </NavLink>
+          </nav>
+
+          <div className="app-nav-user">
+            <span>{user?.displayName || "Gift Ledger User"}</span>
+
+            <button
+              type="button"
+              className="logout-button"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 

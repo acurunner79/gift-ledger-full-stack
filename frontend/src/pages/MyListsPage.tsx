@@ -227,8 +227,8 @@ export function MyListsPage() {
         </div>
       )}
 
-      <section className="settings-grid">
-        <form className="settings-card" onSubmit={handleCreateList}>
+      <section className="my-lists-stack">
+        <form className="settings-card create-list-panel" onSubmit={handleCreateList}>
           <p className="section-label">Create List</p>
           <h2>New gift list</h2>
           <p>
@@ -275,7 +275,7 @@ export function MyListsPage() {
           </button>
         </form>
 
-      <section className="preview-table-card">
+      <section className="preview-table-card list-library-panel">
         <div className="table-header">
           <div>
             <p className="section-label">List Library</p>
@@ -293,133 +293,150 @@ export function MyListsPage() {
             <p>Create your first named list to start organizing items.</p>
           </div>
         ) : (
-          <div className="list-library-grid">
-            {giftLists.map((giftList) => {
-              const isEditing = editingListId === giftList.id;
-              const isSaving = savingListId === giftList.id;
-              const isSettingDefault = settingDefaultListId === giftList.id;
+         <div className="list-library-table-wrap">
+          <table className="list-library-table">
+            <thead>
+              <tr>
+                <th>List</th>
+                <th>Occasion</th>
+                <th>Items</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
 
-              if (isEditing) {
+            <tbody>
+              {giftLists.map((giftList) => {
+                const isEditing = editingListId === giftList.id;
+                const isSaving = savingListId === giftList.id;
+                const isSettingDefault = settingDefaultListId === giftList.id;
+
+                if (isEditing) {
+                  return (
+                    <tr className="list-library-edit-row" key={giftList.id}>
+                      <td colSpan={5}>
+                        <form
+                          className="list-library-card editing"
+                          onSubmit={handleUpdateList}
+                        >
+                          <label>
+                            List name
+                            <input
+                              type="text"
+                              value={editTitle}
+                              onChange={(event) => setEditTitle(event.target.value)}
+                              maxLength={80}
+                              required
+                            />
+                          </label>
+
+                          <label>
+                            Occasion
+                            <input
+                              type="text"
+                              value={editOccasion}
+                              onChange={(event) => setEditOccasion(event.target.value)}
+                              maxLength={80}
+                            />
+                          </label>
+
+                          <label>
+                            Description
+                            <textarea
+                              value={editDescription}
+                              onChange={(event) =>
+                                setEditDescription(event.target.value)
+                              }
+                              rows={3}
+                              maxLength={500}
+                            />
+                          </label>
+
+                          <div className="list-card-actions">
+                            <button type="submit" disabled={isSaving}>
+                              {isSaving ? "Saving..." : "Save Changes"}
+                            </button>
+
+                            <button
+                              type="button"
+                              className="secondary-button compact-button"
+                              onClick={cancelEditingList}
+                              disabled={isSaving}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </form>
+                      </td>
+                    </tr>
+                  );
+                }
+
                 return (
-                  <form
-                    className="list-library-card editing"
-                    key={giftList.id}
-                    onSubmit={handleUpdateList}
-                  >
-                    <label>
-                      List name
-                      <input
-                        type="text"
-                        value={editTitle}
-                        onChange={(event) => setEditTitle(event.target.value)}
-                        maxLength={80}
-                        required
-                      />
-                    </label>
+                  <tr key={giftList.id}>
+                    <td>
+                      <strong>{giftList.title}</strong>
 
-                    <label>
-                      Occasion
-                      <input
-                        type="text"
-                        value={editOccasion}
-                        onChange={(event) => setEditOccasion(event.target.value)}
-                        maxLength={80}
-                      />
-                    </label>
-
-                    <label>
-                      Description
-                      <textarea
-                        value={editDescription}
-                        onChange={(event) => setEditDescription(event.target.value)}
-                        rows={3}
-                        maxLength={500}
-                      />
-                    </label>
-
-                    <div className="list-card-actions">
-                      <button type="submit" disabled={isSaving}>
-                        {isSaving ? "Saving..." : "Save Changes"}
-                      </button>
-
-                      <button
-                        type="button"
-                        className="secondary-button compact-button"
-                        onClick={cancelEditingList}
-                        disabled={isSaving}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                );
-              }
-
-              return (
-                <article className="list-library-card" key={giftList.id}>
-                  <div className="list-card-main">
-                    <div>
-                      <div className="list-card-title-row">
-                        <h3>{giftList.title}</h3>
-
-                        {giftList.isDefault && (
-                          <span className="success-pill compact-pill">Default</span>
-                        )}
-                      </div>
-
-                      {giftList.description && (
-                        <p className="list-card-description">
-                          {giftList.description}
-                        </p>
+                      {giftList.description ? (
+                        <p className="table-subtext">{giftList.description}</p>
+                      ) : (
+                        <p className="table-muted">No description</p>
                       )}
-                    </div>
+                    </td>
 
-                    <div className="list-card-meta">
-                      <span>
-                        Occasion
-                        <strong>{giftList.occasion || "General"}</strong>
-                      </span>
+                    <td>
+                      <strong>{giftList.occasion || "General"}</strong>
+                    </td>
 
-                      <span>
-                        Items
-                        <strong>{giftList._count.items}</strong>
-                      </span>
-                    </div>
-                  </div>
+                    <td>
+                      <strong>{giftList._count.items}</strong>
+                    </td>
 
-                  <div className="list-card-actions">
-                    <Link
-                      className="button-link secondary-button compact-button"
-                      to={`/lists/${giftList.id}`}
-                    >
-                      Open
-                    </Link>
+                    <td>
+                      {giftList.isDefault ? (
+                        <span className="success-pill compact-pill">Default</span>
+                      ) : (
+                        <span className="status-pill">Active</span>
+                      )}
+                    </td>
 
-                    <button
-                      type="button"
-                      className="secondary-button compact-button"
-                      onClick={() => startEditingList(giftList)}
-                    >
-                      Edit
-                    </button>
+                    <td>
+                      <div className="table-actions">
+                        <Link
+                          className="button-link secondary-button compact-button"
+                          to={`/lists/${giftList.id}`}
+                        >
+                          Open
+                        </Link>
 
-                    <button
-                      type="button"
-                      className="secondary-button compact-button"
-                      onClick={() => handleSetDefault(giftList.id)}
-                      disabled={giftList.isDefault || isSettingDefault}
-                    >
-                      {giftList.isDefault
-                        ? "Default"
-                        : isSettingDefault
-                          ? "Setting..."
-                          : "Set Default"}
-                    </button>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+                        <button
+                          type="button"
+                          className="secondary-button compact-button"
+                          onClick={() => startEditingList(giftList)}
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          type="button"
+                          className="secondary-button compact-button"
+                          onClick={() => handleSetDefault(giftList.id)}
+                          disabled={giftList.isDefault || isSettingDefault}
+                        >
+                          {giftList.isDefault
+                            ? "Default"
+                            : isSettingDefault
+                              ? "Setting..."
+                              : "Set Default"}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div> 
         )}
       </section>  
       </section>

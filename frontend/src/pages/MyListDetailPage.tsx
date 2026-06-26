@@ -373,67 +373,84 @@ export function MyListDetailPage() {
       )}
 
       <section className="list-detail-stack">
-        <form className="settings-card add-item-panel" onSubmit={handleCreateGiftItem}>
-          <p className="section-label">Add Item</p>
-          <h2>New gift idea</h2>
-          <p>
-            This item will be added directly to{" "}
-            <strong>{giftList?.title || "this list"}</strong>.
-          </p>
+               <form
+          className="settings-card add-item-panel compact-add-item-panel"
+          onSubmit={handleCreateGiftItem}
+        >
+          <div className="compact-add-item-header">
+            <div>
+              <p className="section-label">Add Item</p>
+              <h2>New gift idea</h2>
+              <p className="compact-add-item-copy">
+                This item will be added directly to{" "}
+                <strong>{giftList?.title || "this list"}</strong>.
+              </p>
+            </div>
 
-          <label>
-            Item name
-            <input
-              type="text"
-              value={itemName}
-              onChange={(event) => setItemName(event.target.value)}
-              placeholder="LEGO set, headphones, tool kit..."
-              maxLength={120}
-              required
-            />
-          </label>
+            <button
+              type="submit"
+              className="compact-add-item-submit"
+              disabled={isCreatingItem || !giftList}
+            >
+              {isCreatingItem ? "Adding Item..." : "Add Item to List"}
+            </button>
+          </div>
 
-          <label>
-            Item link
-            <input
-              type="url"
-              value={itemLink}
-              onChange={(event) => setItemLink(event.target.value)}
-              placeholder="https://example.com/item"
-              maxLength={500}
-            />
-          </label>
+          <div className="compact-add-item-grid">
+            <label className="compact-field">
+              Item name
+              <input
+                type="text"
+                value={itemName}
+                onChange={(event) => setItemName(event.target.value)}
+                placeholder="LEGO set, headphones, tool kit..."
+                maxLength={120}
+                required
+              />
+            </label>
 
-          <label>
-            Description
-            <textarea
-              value={itemDescription}
-              onChange={(event) => setItemDescription(event.target.value)}
-              rows={4}
-              maxLength={1000}
-              placeholder="Optional notes, size, color, model, or preference details."
-            />
-          </label>
+            <label className="compact-field">
+              Item link
+              <input
+                type="url"
+                value={itemLink}
+                onChange={(event) => setItemLink(event.target.value)}
+                placeholder="https://example.com/item"
+                maxLength={500}
+              />
+            </label>
 
-          <label>
-            Quantity
-            <input
-              type="number"
-              value={quantity}
-              onChange={(event) => setQuantity(Number(event.target.value))}
-              min={1}
-              max={99}
-              required
-            />
-          </label>
+            <label className="compact-field compact-quantity">
+              Quantity
+              <input
+                type="number"
+                value={quantity}
+                onChange={(event) => setQuantity(Number(event.target.value))}
+                min={1}
+                max={99}
+                required
+              />
+            </label>
 
-          <div className="alternative-form-section">
-            <div className="alternative-form-header">
-              <div>
-                <p className="section-label">Alternatives</p>
-                <h3>Backup options</h3>
-              </div>
+            <label className="compact-field compact-description">
+              Description
+              <textarea
+                value={itemDescription}
+                onChange={(event) => setItemDescription(event.target.value)}
+                rows={2}
+                maxLength={1000}
+                placeholder="Optional notes, size, color, model, or preference details."
+              />
+            </label>
+          </div>
 
+          <details className="compact-alternatives-drawer">
+            <summary>
+              <span>Alternatives</span>
+              <small>Optional backup options</small>
+            </summary>
+
+            <div className="compact-alternatives-body">
               <button
                 type="button"
                 className="secondary-button compact-button"
@@ -441,73 +458,69 @@ export function MyListDetailPage() {
               >
                 Add Alternative
               </button>
+
+              {alternatives.length === 0 ? (
+                <p className="hero-text compact-empty-text">
+                  No alternatives added.
+                </p>
+              ) : (
+                <div className="alternative-form-list">
+                  {alternatives.map((alternative, index) => (
+                    <div className="alternative-form-card" key={index}>
+                      <label>
+                        Alternative name
+                        <input
+                          type="text"
+                          value={alternative.name}
+                          onChange={(event) =>
+                            updateAlternative(index, "name", event.target.value)
+                          }
+                          maxLength={120}
+                          required
+                        />
+                      </label>
+
+                      <label>
+                        Alternative link
+                        <input
+                          type="url"
+                          value={alternative.link}
+                          onChange={(event) =>
+                            updateAlternative(index, "link", event.target.value)
+                          }
+                          maxLength={500}
+                        />
+                      </label>
+
+                      <label>
+                        Alternative description
+                        <textarea
+                          value={alternative.description}
+                          onChange={(event) =>
+                            updateAlternative(
+                              index,
+                              "description",
+                              event.target.value
+                            )
+                          }
+                          rows={3}
+                          maxLength={500}
+                        />
+                      </label>
+
+                      <button
+                        type="button"
+                        className="secondary-button compact-button"
+                        onClick={() => removeAlternative(index)}
+                      >
+                        Remove Alternative
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-
-            {alternatives.length === 0 ? (
-              <p className="hero-text">
-                No alternatives added. This is optional.
-              </p>
-            ) : (
-              <div className="alternative-form-list">
-                {alternatives.map((alternative, index) => (
-                  <div className="alternative-form-card" key={index}>
-                    <label>
-                      Alternative name
-                      <input
-                        type="text"
-                        value={alternative.name}
-                        onChange={(event) =>
-                          updateAlternative(index, "name", event.target.value)
-                        }
-                        maxLength={120}
-                        required
-                      />
-                    </label>
-
-                    <label>
-                      Alternative link
-                      <input
-                        type="url"
-                        value={alternative.link}
-                        onChange={(event) =>
-                          updateAlternative(index, "link", event.target.value)
-                        }
-                        maxLength={500}
-                      />
-                    </label>
-
-                    <label>
-                      Alternative description
-                      <textarea
-                        value={alternative.description}
-                        onChange={(event) =>
-                          updateAlternative(
-                            index,
-                            "description",
-                            event.target.value
-                          )
-                        }
-                        rows={3}
-                        maxLength={500}
-                      />
-                    </label>
-
-                    <button
-                      type="button"
-                      className="secondary-button compact-button"
-                      onClick={() => removeAlternative(index)}
-                    >
-                      Remove Alternative
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <button type="submit" disabled={isCreatingItem || !giftList}>
-            {isCreatingItem ? "Adding Item..." : "Add Item to List"}
-          </button>
+          </details>
         </form>
 
         <section className="preview-table-card connected-list-card gift-ideas-panel">
@@ -535,258 +548,264 @@ export function MyListDetailPage() {
               <p>Add the first gift idea using the form on this page.</p>
             </div>
           ) : (
-            <div className="gift-item-list">
-              {giftList.items.map((item) => {
-                const isEditing = editingItemId === item.id;
-                const isSaving = savingItemId === item.id;
-                const isArchiving = archivingItemId === item.id;
+            <div className="gift-ideas-table-wrap">
+              <table className="gift-ideas-table">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Description</th>
+                    <th>Qty</th>
+                    <th>Link</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
 
-                if (isEditing) {
-                  return (
-                    <article className="gift-item-card editing" key={item.id}>
-                      <form
-                        className="item-edit-form"
-                        onSubmit={handleUpdateGiftItem}
-                      >
-                        <div className="gift-item-header">
-                          <div>
-                            <p className="section-label">Edit Item</p>
-                            <h3>{item.itemName}</h3>
-                          </div>
+                <tbody>
+                  {giftList.items.map((item) => {
+                    const isEditing = editingItemId === item.id;
+                    const isSaving = savingItemId === item.id;
+                    const isArchiving = archivingItemId === item.id;
 
-                          <span className="warning-pill">Editing</span>
-                        </div>
+                    if (isEditing) {
+                      return (
+                        <tr className="gift-ideas-edit-row" key={item.id}>
+                          <td colSpan={6}>
+                            <article className="gift-item-card editing">
+                              <form
+                                className="item-edit-form"
+                                onSubmit={handleUpdateGiftItem}
+                              >
+                                <div className="gift-item-header">
+                                  <div>
+                                    <p className="section-label">Edit Item</p>
+                                    <h3>{item.itemName}</h3>
+                                  </div>
 
-                        <label>
-                          Item name
-                          <input
-                            type="text"
-                            value={editItemName}
-                            onChange={(event) =>
-                              setEditItemName(event.target.value)
-                            }
-                            maxLength={120}
-                            required
-                          />
-                        </label>
+                                  <span className="warning-pill">Editing</span>
+                                </div>
 
-                        <label>
-                          Item link
-                          <input
-                            type="url"
-                            value={editItemLink}
-                            onChange={(event) =>
-                              setEditItemLink(event.target.value)
-                            }
-                            maxLength={500}
-                          />
-                        </label>
+                                <label>
+                                  Item name
+                                  <input
+                                    type="text"
+                                    value={editItemName}
+                                    onChange={(event) =>
+                                      setEditItemName(event.target.value)
+                                    }
+                                    maxLength={120}
+                                    required
+                                  />
+                                </label>
 
-                        <label>
-                          Description
-                          <textarea
-                            value={editItemDescription}
-                            onChange={(event) =>
-                              setEditItemDescription(event.target.value)
-                            }
-                            rows={4}
-                            maxLength={1000}
-                          />
-                        </label>
+                                <label>
+                                  Item link
+                                  <input
+                                    type="url"
+                                    value={editItemLink}
+                                    onChange={(event) =>
+                                      setEditItemLink(event.target.value)
+                                    }
+                                    maxLength={500}
+                                  />
+                                </label>
 
-                        <label>
-                          Quantity
-                          <input
-                            type="number"
-                            value={editQuantity}
-                            onChange={(event) =>
-                              setEditQuantity(Number(event.target.value))
-                            }
-                            min={1}
-                            max={99}
-                            required
-                          />
-                        </label>
+                                <label>
+                                  Description
+                                  <textarea
+                                    value={editItemDescription}
+                                    onChange={(event) =>
+                                      setEditItemDescription(event.target.value)
+                                    }
+                                    rows={4}
+                                    maxLength={1000}
+                                  />
+                                </label>
 
-                        <div className="alternative-form-section">
-                          <div className="alternative-form-header">
-                            <div>
-                              <p className="section-label">Alternatives</p>
-                              <h3>Edit backup options</h3>
-                            </div>
+                                <label>
+                                  Quantity
+                                  <input
+                                    type="number"
+                                    value={editQuantity}
+                                    onChange={(event) =>
+                                      setEditQuantity(Number(event.target.value))
+                                    }
+                                    min={1}
+                                    max={99}
+                                    required
+                                  />
+                                </label>
 
-                            <button
-                              type="button"
-                              className="secondary-button compact-button"
-                              onClick={addEditAlternative}
-                            >
-                              Add Alternative
-                            </button>
-                          </div>
+                                <div className="alternative-form-section">
+                                  <div className="alternative-form-header">
+                                    <div>
+                                      <p className="section-label">Alternatives</p>
+                                      <h3>Edit backup options</h3>
+                                    </div>
 
-                          {editAlternatives.length === 0 ? (
-                            <p className="hero-text">
-                              No alternatives added.
-                            </p>
-                          ) : (
-                            <div className="alternative-form-list">
-                              {editAlternatives.map((alternative, index) => (
-                                <div
-                                  className="alternative-form-card"
-                                  key={index}
-                                >
-                                  <label>
-                                    Alternative name
-                                    <input
-                                      type="text"
-                                      value={alternative.name}
-                                      onChange={(event) =>
-                                        updateEditAlternative(
-                                          index,
-                                          "name",
-                                          event.target.value
-                                        )
-                                      }
-                                      maxLength={120}
-                                      required
-                                    />
-                                  </label>
+                                    <button
+                                      type="button"
+                                      className="secondary-button compact-button"
+                                      onClick={addEditAlternative}
+                                    >
+                                      Add Alternative
+                                    </button>
+                                  </div>
 
-                                  <label>
-                                    Alternative link
-                                    <input
-                                      type="url"
-                                      value={alternative.link}
-                                      onChange={(event) =>
-                                        updateEditAlternative(
-                                          index,
-                                          "link",
-                                          event.target.value
-                                        )
-                                      }
-                                      maxLength={500}
-                                    />
-                                  </label>
+                                  {editAlternatives.length === 0 ? (
+                                    <p className="hero-text">No alternatives added.</p>
+                                  ) : (
+                                    <div className="alternative-form-list">
+                                      {editAlternatives.map((alternative, index) => (
+                                        <div
+                                          className="alternative-form-card"
+                                          key={index}
+                                        >
+                                          <label>
+                                            Alternative name
+                                            <input
+                                              type="text"
+                                              value={alternative.name}
+                                              onChange={(event) =>
+                                                updateEditAlternative(
+                                                  index,
+                                                  "name",
+                                                  event.target.value
+                                                )
+                                              }
+                                              maxLength={120}
+                                              required
+                                            />
+                                          </label>
 
-                                  <label>
-                                    Alternative description
-                                    <textarea
-                                      value={alternative.description}
-                                      onChange={(event) =>
-                                        updateEditAlternative(
-                                          index,
-                                          "description",
-                                          event.target.value
-                                        )
-                                      }
-                                      rows={3}
-                                      maxLength={500}
-                                    />
-                                  </label>
+                                          <label>
+                                            Alternative link
+                                            <input
+                                              type="url"
+                                              value={alternative.link}
+                                              onChange={(event) =>
+                                                updateEditAlternative(
+                                                  index,
+                                                  "link",
+                                                  event.target.value
+                                                )
+                                              }
+                                              maxLength={500}
+                                            />
+                                          </label>
+
+                                          <label>
+                                            Alternative description
+                                            <textarea
+                                              value={alternative.description}
+                                              onChange={(event) =>
+                                                updateEditAlternative(
+                                                  index,
+                                                  "description",
+                                                  event.target.value
+                                                )
+                                              }
+                                              rows={3}
+                                              maxLength={500}
+                                            />
+                                          </label>
+
+                                          <button
+                                            type="button"
+                                            className="secondary-button compact-button"
+                                            onClick={() => removeEditAlternative(index)}
+                                          >
+                                            Remove Alternative
+                                          </button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className="item-card-actions">
+                                  <button type="submit" disabled={isSaving}>
+                                    {isSaving ? "Saving..." : "Save Changes"}
+                                  </button>
 
                                   <button
                                     type="button"
                                     className="secondary-button compact-button"
-                                    onClick={() =>
-                                      removeEditAlternative(index)
-                                    }
+                                    onClick={cancelEditingItem}
+                                    disabled={isSaving}
                                   >
-                                    Remove Alternative
+                                    Cancel
                                   </button>
                                 </div>
-                              ))}
-                            </div>
+                              </form>
+                            </article>
+                          </td>
+                        </tr>
+                      );
+                    }
+
+                    return (
+                      <tr key={item.id}>
+                        <td>
+                          <strong>{item.itemName}</strong>
+
+                          {item.alternatives.length > 0 && (
+                            <p className="table-subtext">
+                              {item.alternatives.length} alternative
+                              {item.alternatives.length === 1 ? "" : "s"}
+                            </p>
                           )}
-                        </div>
+                        </td>
 
-                        <div className="item-card-actions">
-                          <button type="submit" disabled={isSaving}>
-                            {isSaving ? "Saving..." : "Save Changes"}
-                          </button>
+                        <td>
+                          {item.itemDescription ? (
+                            <span>{item.itemDescription}</span>
+                          ) : (
+                            <span className="table-muted">No description</span>
+                          )}
+                        </td>
 
-                          <button
-                            type="button"
-                            className="secondary-button compact-button"
-                            onClick={cancelEditingItem}
-                            disabled={isSaving}
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </form>
-                    </article>
-                  );
-                }
+                        <td>{item.quantity}</td>
 
-                return (
-                  <article className="gift-item-card" key={item.id}>
-                    <div className="gift-item-header">
-                      <div>
-                        <h3>{item.itemName}</h3>
-                        <p>Quantity wanted: {item.quantity}</p>
-                      </div>
+                        <td>
+                          {item.itemLink ? (
+                            <a href={item.itemLink} target="_blank" rel="noreferrer">
+                              View link
+                            </a>
+                          ) : (
+                            <span className="table-muted">None</span>
+                          )}
+                        </td>
 
-                      <span className="status-pill">Active</span>
-                    </div>
+                        <td>
+                          <span className="status-pill">Active</span>
+                        </td>
 
-                    {item.itemDescription && <p>{item.itemDescription}</p>}
+                        <td>
+                          <div className="table-actions">
+                            <button
+                              type="button"
+                              className="secondary-button compact-button"
+                              onClick={() => startEditingItem(item)}
+                            >
+                              Edit
+                            </button>
 
-                    {item.itemLink && (
-                      <a href={item.itemLink} target="_blank" rel="noreferrer">
-                        View item link
-                      </a>
-                    )}
-
-                    {item.alternatives.length > 0 && (
-                      <div className="alternative-display">
-                        <p className="section-label">Alternatives</p>
-
-                        {item.alternatives.map((alternative) => (
-                          <div
-                            className="alternative-display-card"
-                            key={alternative.id}
-                          >
-                            <strong>{alternative.name}</strong>
-
-                            {alternative.description && (
-                              <p>{alternative.description}</p>
-                            )}
-
-                            {alternative.link && (
-                              <a
-                                href={alternative.link}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                View alternative
-                              </a>
-                            )}
+                            <button
+                              type="button"
+                              className="secondary-button compact-button"
+                              onClick={() => handleArchiveGiftItem(item)}
+                              disabled={isArchiving}
+                            >
+                              {isArchiving ? "Archiving..." : "Archive"}
+                            </button>
                           </div>
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="item-card-actions">
-                      <button
-                        type="button"
-                        className="secondary-button compact-button"
-                        onClick={() => startEditingItem(item)}
-                      >
-                        Edit
-                      </button>
-
-                      <button
-                        type="button"
-                        className="secondary-button compact-button"
-                        onClick={() => handleArchiveGiftItem(item)}
-                        disabled={isArchiving}
-                      >
-                        {isArchiving ? "Archiving..." : "Archive"}
-                      </button>
-                    </div>
-                  </article>
-                );
-              })}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           )}
         </section>

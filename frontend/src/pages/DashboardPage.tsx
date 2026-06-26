@@ -97,7 +97,7 @@ export function DashboardPage() {
 
   return (
     <>
-      <section className="hero-card">
+      <section className="hero-card dashboard-hero-card">
         <div className="dashboard-header">
           <div>
             <p className="eyebrow">Gift Ledger Dashboard</p>
@@ -109,7 +109,7 @@ export function DashboardPage() {
             </p>
           </div>
 
-          <div className="dashboard-actions">
+          {/* <div className="dashboard-actions">
             <Link className="button-link secondary-button" to="/lists">
               My Lists
             </Link>
@@ -121,7 +121,7 @@ export function DashboardPage() {
             <Link className="button-link secondary-button" to="/settings">
               Settings
             </Link>
-          </div>
+          </div> */}
         </div>
       </section>
 
