@@ -2425,3 +2425,425 @@ select:disabled {
     justify-self: center;
   }
 }
+
+@media (max-width: 640px) {
+  .gift-ideas-table-wrap {
+    border: none;
+    background: transparent;
+    overflow: visible;
+  }
+
+  .gift-ideas-table {
+    min-width: 0;
+    border-collapse: separate;
+    border-spacing: 0 1rem;
+  }
+
+  .gift-ideas-table thead {
+    display: none;
+  }
+
+  .gift-ideas-table,
+  .gift-ideas-table tbody,
+  .gift-ideas-table tr,
+  .gift-ideas-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .gift-ideas-table tr {
+    padding: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 1.25rem;
+    background: var(--color-surface-alt);
+  }
+
+  .gift-ideas-table td {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 0.75rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .gift-ideas-table td:last-child {
+    border-bottom: none;
+  }
+
+  .gift-ideas-table td::before {
+    color: var(--color-muted-text);
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .gift-ideas-table td:nth-child(1)::before {
+    content: "Item";
+  }
+
+  .gift-ideas-table td:nth-child(2)::before {
+    content: "Description";
+  }
+
+  .gift-ideas-table td:nth-child(3)::before {
+    content: "Qty";
+  }
+
+  .gift-ideas-table td:nth-child(4)::before {
+    content: "Link";
+  }
+
+  .gift-ideas-table td:nth-child(5)::before {
+    content: "Status";
+  }
+
+  .gift-ideas-table td:nth-child(6)::before {
+    content: "Actions";
+  }
+
+  .table-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .list-library-table-wrap {
+    border: none;
+    background: transparent;
+    overflow: visible;
+  }
+
+  .list-library-table {
+    min-width: 0;
+    border-collapse: separate;
+    border-spacing: 0 1rem;
+  }
+
+  .list-library-table thead {
+    display: none;
+  }
+
+  .list-library-table,
+  .list-library-table tbody,
+  .list-library-table tr,
+  .list-library-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .list-library-table tr {
+    padding: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 1.25rem;
+    background: var(--color-surface-alt);
+  }
+
+  .list-library-table td {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 0.75rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .list-library-table td:last-child {
+    border-bottom: none;
+  }
+
+  .list-library-table td::before {
+    color: var(--color-muted-text);
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .list-library-table td:nth-child(1)::before {
+    content: "List";
+  }
+
+  .list-library-table td:nth-child(2)::before {
+    content: "Occasion";
+  }
+
+  .list-library-table td:nth-child(3)::before {
+    content: "Items";
+  }
+
+  .list-library-table td:nth-child(4)::before {
+    content: "Status";
+  }
+
+  .list-library-table td:nth-child(5)::before {
+    content: "Actions";
+  }
+}
+
+/* Polished mobile List Library cards */
+@media (max-width: 640px) {
+  .list-library-table-wrap {
+    border: none;
+    background: transparent;
+    overflow: visible;
+  }
+
+  .list-library-table {
+    min-width: 0;
+    border-collapse: separate;
+    border-spacing: 0 1rem;
+  }
+
+  .list-library-table thead {
+    display: none;
+  }
+
+  .list-library-table,
+  .list-library-table tbody,
+  .list-library-table tr,
+  .list-library-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .list-library-table tr {
+    padding: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 1.25rem;
+    background: var(--color-surface-alt);
+  }
+
+  /* First cell becomes the card header */
+  .list-library-table td:first-child {
+    padding: 0 0 0.9rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .list-library-table td:first-child::before {
+    display: none;
+  }
+
+  .list-library-table td:first-child strong {
+    display: block;
+    max-width: 100%;
+    color: var(--color-text);
+    font-size: 1.15rem;
+    line-height: 1.2;
+  }
+
+  .list-library-table td:first-child .table-subtext,
+  .list-library-table td:first-child .table-muted {
+    margin-top: 0.45rem;
+    font-size: 0.95rem;
+    line-height: 1.35;
+  }
+
+  /* Metadata rows */
+  .list-library-table td:not(:first-child):not(:last-child) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .list-library-table td:not(:first-child):not(:last-child)::before {
+    color: var(--color-muted-text);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+
+  .list-library-table td:nth-child(2)::before {
+    content: "Occasion";
+  }
+
+  .list-library-table td:nth-child(3)::before {
+    content: "Items";
+  }
+
+  .list-library-table td:nth-child(4)::before {
+    content: "Status";
+  }
+
+  /* Actions area */
+  .list-library-table td:last-child {
+    padding: 0.9rem 0 0;
+    border-bottom: none;
+  }
+
+  .list-library-table td:last-child::before {
+    content: "Actions";
+    display: block;
+    margin-bottom: 0.65rem;
+    color: var(--color-muted-text);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+
+  .list-library-table .table-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+  }
+
+  .list-library-table .table-actions > * {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .list-library-table .table-actions > :nth-child(3) {
+    grid-column: 1 / -1;
+  }
+
+  .list-library-table .compact-button,
+  .list-library-table .button-link {
+    min-height: 42px;
+  }
+}
+
+/* FINAL OVERRIDE: Mobile List Library card layout */
+@media (max-width: 640px) {
+  .list-library-table-wrap {
+    border: none !important;
+    background: transparent !important;
+    overflow: visible !important;
+  }
+
+  .list-library-table {
+    width: 100% !important;
+    min-width: 0 !important;
+    border-collapse: separate !important;
+    border-spacing: 0 1rem !important;
+  }
+
+  .list-library-table thead {
+    display: none !important;
+  }
+
+  .list-library-table,
+  .list-library-table tbody,
+  .list-library-table tr,
+  .list-library-table td {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .list-library-table tr {
+    padding: 1.1rem !important;
+    border: 1px solid var(--color-border) !important;
+    border-radius: 1.25rem !important;
+    background: var(--color-surface-alt) !important;
+  }
+
+  .list-library-table td {
+    text-align: left !important;
+  }
+
+  .list-library-table td:first-child {
+    padding: 0 0 1rem !important;
+    border-bottom: 1px solid var(--color-border) !important;
+  }
+
+  .list-library-table td:first-child::before {
+    display: none !important;
+    content: "" !important;
+  }
+
+  .list-library-table td:first-child strong {
+    display: block !important;
+    font-size: 1.15rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .list-library-table td:first-child .table-subtext,
+  .list-library-table td:first-child .table-muted {
+    margin-top: 0.45rem !important;
+    font-size: 0.95rem !important;
+    line-height: 1.35 !important;
+  }
+
+  .list-library-table td:nth-child(2),
+  .list-library-table td:nth-child(3),
+  .list-library-table td:nth-child(4) {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    padding: 0.8rem 0 !important;
+    border-bottom: 1px solid var(--color-border) !important;
+  }
+
+  .list-library-table td:nth-child(2)::before {
+    content: "Occasion" !important;
+  }
+
+  .list-library-table td:nth-child(3)::before {
+    content: "Items" !important;
+  }
+
+  .list-library-table td:nth-child(4)::before {
+    content: "Status" !important;
+  }
+
+  .list-library-table td:nth-child(2)::before,
+  .list-library-table td:nth-child(3)::before,
+  .list-library-table td:nth-child(4)::before {
+    display: block !important;
+    color: var(--color-muted-text) !important;
+    font-size: 0.72rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.13em !important;
+    text-transform: uppercase !important;
+  }
+
+  .list-library-table td:nth-child(2) > *,
+  .list-library-table td:nth-child(3) > *,
+  .list-library-table td:nth-child(4) > * {
+    justify-self: end !important;
+    text-align: right !important;
+  }
+
+  .list-library-table td:last-child {
+    padding: 1rem 0 0 !important;
+    border-bottom: none !important;
+  }
+
+  .list-library-table td:last-child::before {
+    content: "Actions" !important;
+    display: block !important;
+    margin-bottom: 0.75rem !important;
+    color: var(--color-muted-text) !important;
+    font-size: 0.72rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.13em !important;
+    text-transform: uppercase !important;
+  }
+
+  .list-library-table .table-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.65rem !important;
+    width: 100% !important;
+  }
+
+  .list-library-table .table-actions > * {
+    width: 100% !important;
+    min-height: 42px !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .list-library-table .table-actions > :nth-child(3) {
+    grid-column: 1 / -1 !important;
+  }
+}
