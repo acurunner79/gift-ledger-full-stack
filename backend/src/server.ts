@@ -57,10 +57,10 @@ const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   });
 };
 
-const authRateLimiter = rateLimit({
+const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 25,
-  standardHeaders: "draft-8",
+  limit: 75,
+  standardHeaders: true,
   legacyHeaders: false,
   message: {
     message: "Too many authentication attempts. Please try again later."
@@ -74,7 +74,7 @@ app.use(
 );
 
 app.use("/health", healthRouter);
-app.use("/api/auth", authRateLimiter, authRouter);
+app.use("/api/auth", authLimiter, authRouter);
 app.use("/api/settings", settingsRouter);
 app.use("/api/themes", themeRouter);
 app.use("/api/gifts", giftRouter);
