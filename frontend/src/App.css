@@ -2950,3 +2950,78 @@ select option {
 .edit-priority-field select {
   margin-top: 0.45rem;
 }
+
+/* Gift Ideas search, filter, and sort controls */
+.gift-table-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(160px, 0.7fr) minmax(190px, 0.8fr) auto;
+  gap: 1rem;
+  align-items: end;
+  margin: 1.25rem 0;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1.25rem;
+  background: color-mix(in srgb, var(--color-surface-alt) 72%, transparent);
+}
+
+.gift-table-controls label {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.gift-table-controls input[type="search"],
+.gift-table-controls select {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 0.95rem;
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+  padding: 0.9rem 1rem;
+  font: inherit;
+  font-weight: 700;
+  outline: none;
+}
+
+.gift-table-controls input[type="search"]:focus,
+.gift-table-controls select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 18%, transparent);
+}
+
+.filter-results-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.65rem 0.95rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-muted-text);
+  font-size: 0.85rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .gift-table-controls {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .filter-results-pill {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .gift-table-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-results-pill {
+    width: 100%;
+  }
+}

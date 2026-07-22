@@ -24,6 +24,15 @@ type AlternativeFormInput = {
   description: string;
 };
 
+type PriorityFilter = "ALL" | GiftPriority;
+
+type GiftSortMode =
+  | "PRIORITY"
+  | "NEWEST"
+  | "QUANTITY_HIGH"
+  | "QUANTITY_LOW"
+  | "NAME";
+
 export function MyListDetailPage() {
   const { token } = useAuth();
   const { listId } = useParams();
@@ -54,6 +63,10 @@ export function MyListDetailPage() {
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  const [giftSearchQuery, setGiftSearchQuery] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>("ALL");
+  const [giftSortMode, setGiftSortMode] = useState<GiftSortMode>("PRIORITY");
 
   async function loadGiftList() {
     if (!token || !listId) {
@@ -364,6 +377,87 @@ function getPriorityClass(value?: GiftPriority | null) {
   return `priority-badge ${safePriority.toLowerCase()}`;
 }
 
+function getPriorityRank(value?: GiftPriority | null) {
+  const safePriority = value || "MEDIUM";
+
+  if (safePriority === "HIGH") {
+    return 1;
+  }
+
+  if (safePriority === "MEDIUM") {
+    return 2;
+  }
+
+  return 3;
+}
+
+function getFilteredAndSortedGiftItems() {
+  if (!giftList) {
+    return [];
+  }
+
+  const normalizedSearchQuery = giftSearchQuery.trim().toLowerCase();
+
+  return [...giftList.items]
+    .filter((item) => {
+      const itemPriority = item.priority || "MEDIUM";
+
+      if (priorityFilter !== "ALL" && itemPriority !== priorityFilter) {
+        return false;
+      }
+
+      if (!normalizedSearchQuery) {
+        return true;
+      }
+
+      const searchableText = [
+        item.itemName,
+        item.itemDescription || "",
+        item.itemLink || "",
+        ...item.alternatives.map((alternative) => alternative.name),
+        ...item.alternatives.map((alternative) => alternative.description || "")
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return searchableText.includes(normalizedSearchQuery);
+    })
+    .sort((firstItem, secondItem) => {
+      if (giftSortMode === "PRIORITY") {
+        const priorityDifference =
+          getPriorityRank(firstItem.priority) - getPriorityRank(secondItem.priority);
+
+        if (priorityDifference !== 0) {
+          return priorityDifference;
+        }
+
+        return (
+          new Date(secondItem.createdAt).getTime() -
+          new Date(firstItem.createdAt).getTime()
+        );
+      }
+
+      if (giftSortMode === "NEWEST") {
+        return (
+          new Date(secondItem.createdAt).getTime() -
+          new Date(firstItem.createdAt).getTime()
+        );
+      }
+
+      if (giftSortMode === "QUANTITY_HIGH") {
+        return secondItem.quantity - firstItem.quantity;
+      }
+
+      if (giftSortMode === "QUANTITY_LOW") {
+        return firstItem.quantity - secondItem.quantity;
+      }
+
+      return firstItem.itemName.localeCompare(secondItem.itemName);
+    });
+}
+
+const filteredGiftItems = getFilteredAndSortedGiftItems();
+
   return (
     <>
       <section className="hero-card">
@@ -574,6 +668,55 @@ function getPriorityClass(value?: GiftPriority | null) {
             </span>
           </div>
 
+          {giftList && giftList.items.length > 0 && (
+          <div className="gift-table-controls">
+            <label>
+              Search
+              <input
+                type="search"
+                value={giftSearchQuery}
+                onChange={(event) => setGiftSearchQuery(event.target.value)}
+                placeholder="Search items, notes, links, or alternatives..."
+              />
+            </label>
+
+            <label>
+              Priority
+              <select
+                value={priorityFilter}
+                onChange={(event) =>
+                  setPriorityFilter(event.target.value as PriorityFilter)
+                }
+              >
+                <option value="ALL">All priorities</option>
+                <option value="HIGH">High</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="LOW">Low</option>
+              </select>
+            </label>
+
+            <label>
+              Sort
+              <select
+                value={giftSortMode}
+                onChange={(event) =>
+                  setGiftSortMode(event.target.value as GiftSortMode)
+                }
+              >
+                <option value="PRIORITY">Priority</option>
+                <option value="NEWEST">Newest</option>
+                <option value="QUANTITY_HIGH">Quantity: High to Low</option>
+                <option value="QUANTITY_LOW">Quantity: Low to High</option>
+                <option value="NAME">Name</option>
+              </select>
+            </label>
+
+            <span className="filter-results-pill">
+              {filteredGiftItems.length} of {giftList.items.length} shown
+            </span>
+          </div>
+        )}
+
           {isLoading ? (
             <p className="hero-text">Loading list...</p>
           ) : !giftList ? (
@@ -585,6 +728,11 @@ function getPriorityClass(value?: GiftPriority | null) {
             <div className="empty-state">
               <h3>No items yet.</h3>
               <p>Add the first gift idea using the form on this page.</p>
+            </div>
+          ) : filteredGiftItems.length === 0 ? (
+            <div className="empty-state">
+              <h3>No matching gift ideas.</h3>
+              <p>Adjust the search or priority filter to show more items.</p>
             </div>
           ) : (
             <div className="gift-ideas-table-wrap">
@@ -602,7 +750,7 @@ function getPriorityClass(value?: GiftPriority | null) {
                 </thead>
 
                 <tbody>
-                  {giftList.items.map((item) => {
+                  {filteredGiftItems.map((item) => {
                     const isEditing = editingItemId === item.id;
                     const isSaving = savingItemId === item.id;
                     const isArchiving = archivingItemId === item.id;
