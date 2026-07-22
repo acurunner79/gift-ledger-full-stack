@@ -3025,3 +3025,18 @@ select option {
     width: 100%;
   }
 }
+
+/* Connected list item priority and quantity row */
+.connected-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.connected-item-meta p {
+  margin: 0;
+  color: var(--color-muted-text);
+  font-weight: 800;
+}

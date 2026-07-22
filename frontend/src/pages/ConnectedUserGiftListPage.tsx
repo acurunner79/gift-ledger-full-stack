@@ -7,10 +7,20 @@ import type {
   ConnectedUserGiftListResponse,
   GiftClaimResponse,
   GiftItem,
-  GiftList
+  GiftList,
+  GiftPriority
 } from "../types/gift";
 
 type GiftListAction = "reserve" | "purchase" | "cancel";
+
+type PriorityFilter = "ALL" | GiftPriority;
+
+type GiftSortMode =
+  | "PRIORITY"
+  | "NEWEST"
+  | "QUANTITY_HIGH"
+  | "QUANTITY_LOW"
+  | "NAME";
 
 export function ConnectedUserGiftListPage() {
   const { token } = useAuth();
@@ -26,6 +36,10 @@ export function ConnectedUserGiftListPage() {
   );
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  const [giftSearchQuery, setGiftSearchQuery] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>("ALL");
+  const [giftSortMode, setGiftSortMode] = useState<GiftSortMode>("PRIORITY");
 
   const connectedGiftListEndpoint =
   userId && listId ? `/api/gifts/users/${userId}/lists/${listId}` : "";
@@ -221,6 +235,106 @@ export function ConnectedUserGiftListPage() {
 
     return "available-pill";
   }
+
+  function formatPriorityLabel(value?: GiftPriority | null) {
+  const safePriority = value || "MEDIUM";
+
+  if (safePriority === "HIGH") {
+    return "High";
+  }
+
+  if (safePriority === "LOW") {
+    return "Low";
+  }
+
+  return "Medium";
+}
+
+function getPriorityClass(value?: GiftPriority | null) {
+  const safePriority = value || "MEDIUM";
+
+  return `priority-badge ${safePriority.toLowerCase()}`;
+}
+
+function getPriorityRank(value?: GiftPriority | null) {
+  const safePriority = value || "MEDIUM";
+
+  if (safePriority === "HIGH") {
+    return 1;
+  }
+
+  if (safePriority === "MEDIUM") {
+    return 2;
+  }
+
+  return 3;
+}
+
+function getFilteredAndSortedGiftItems() {
+  if (!giftList) {
+    return [];
+  }
+
+  const normalizedSearchQuery = giftSearchQuery.trim().toLowerCase();
+
+  return [...giftList.items]
+    .filter((item) => {
+      const itemPriority = item.priority || "MEDIUM";
+
+      if (priorityFilter !== "ALL" && itemPriority !== priorityFilter) {
+        return false;
+      }
+
+      if (!normalizedSearchQuery) {
+        return true;
+      }
+
+      const searchableText = [
+        item.itemName,
+        item.itemDescription || "",
+        item.itemLink || "",
+        ...item.alternatives.map((alternative) => alternative.name),
+        ...item.alternatives.map((alternative) => alternative.description || "")
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return searchableText.includes(normalizedSearchQuery);
+    })
+    .sort((firstItem, secondItem) => {
+      if (giftSortMode === "PRIORITY") {
+        const priorityDifference =
+          getPriorityRank(firstItem.priority) -
+          getPriorityRank(secondItem.priority);
+
+        if (priorityDifference !== 0) {
+          return priorityDifference;
+        }
+
+        return (
+          new Date(secondItem.createdAt).getTime() -
+          new Date(firstItem.createdAt).getTime()
+        );
+      }
+
+      if (giftSortMode === "NEWEST") {
+        return (
+          new Date(secondItem.createdAt).getTime() -
+          new Date(firstItem.createdAt).getTime()
+        );
+      }
+
+      if (giftSortMode === "QUANTITY_HIGH") {
+        return secondItem.quantity - firstItem.quantity;
+      }
+
+      if (giftSortMode === "QUANTITY_LOW") {
+        return firstItem.quantity - secondItem.quantity;
+      }
+
+      return firstItem.itemName.localeCompare(secondItem.itemName);
+    });
+}
 
   async function handleReserveItem(item: GiftItem) {
     if (!token) {
@@ -457,6 +571,8 @@ export function ConnectedUserGiftListPage() {
     );
   }
 
+  const filteredGiftItems = getFilteredAndSortedGiftItems();
+
   return (
     <>
       <section className="hero-card">
@@ -509,6 +625,55 @@ export function ConnectedUserGiftListPage() {
           <span className="status-pill">{giftList?.items.length || 0} Items</span>
         </div>
 
+        {giftList && giftList.items.length > 0 && (
+          <div className="gift-table-controls">
+            <label>
+              Search
+              <input
+                type="search"
+                value={giftSearchQuery}
+                onChange={(event) => setGiftSearchQuery(event.target.value)}
+                placeholder="Search items, notes, links, or alternatives..."
+              />
+            </label>
+
+            <label>
+              Priority
+              <select
+                value={priorityFilter}
+                onChange={(event) =>
+                  setPriorityFilter(event.target.value as PriorityFilter)
+                }
+              >
+                <option value="ALL">All priorities</option>
+                <option value="HIGH">High</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="LOW">Low</option>
+              </select>
+            </label>
+
+            <label>
+              Sort
+              <select
+                value={giftSortMode}
+                onChange={(event) =>
+                  setGiftSortMode(event.target.value as GiftSortMode)
+                }
+              >
+                <option value="PRIORITY">Priority</option>
+                <option value="NEWEST">Newest</option>
+                <option value="QUANTITY_HIGH">Quantity: High to Low</option>
+                <option value="QUANTITY_LOW">Quantity: Low to High</option>
+                <option value="NAME">Name</option>
+              </select>
+            </label>
+
+            <span className="filter-results-pill">
+              {filteredGiftItems.length} of {giftList.items.length} shown
+            </span>
+          </div>
+        )}
+
         {isLoading ? (
           <p className="hero-text">Loading gift list...</p>
         ) : !giftList ? (
@@ -521,14 +686,26 @@ export function ConnectedUserGiftListPage() {
             <h3>No gift ideas yet.</h3>
             <p>This user has not added any active gift ideas to this list.</p>
           </div>
+        ) : filteredGiftItems.length === 0 ? (
+          <div className="empty-state">
+            <h3>No matching gift ideas.</h3>
+            <p>Adjust the search or priority filter to show more items.</p>
+          </div>
         ) : (
           <div className="gift-item-list">
-            {giftList.items.map((item) => (
+            {filteredGiftItems.map((item) => (
               <article className="gift-item-card" key={item.id}>
                 <div className="gift-item-header">
                   <div>
                     <h3>{item.itemName}</h3>
-                    <p>Quantity wanted: {item.quantity}</p>
+
+                    <div className="connected-item-meta">
+                      <span className={getPriorityClass(item.priority)}>
+                        {formatPriorityLabel(item.priority)}
+                      </span>
+
+                      <p>Quantity wanted: {item.quantity}</p>
+                    </div>
                   </div>
 
                   <span className={getClaimStatusClass(item)}>
