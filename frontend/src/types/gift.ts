@@ -1,5 +1,7 @@
 import type { ConnectionUser } from "./connection";
 
+export type GiftPriority = "HIGH" | "MEDIUM" | "LOW";
+
 export type GiftAlternative = {
   id: string;
   giftItemId: string;
@@ -19,6 +21,7 @@ export type GiftItem = {
   itemLink: string | null;
   itemDescription: string | null;
   quantity: number;
+  priority: GiftPriority;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

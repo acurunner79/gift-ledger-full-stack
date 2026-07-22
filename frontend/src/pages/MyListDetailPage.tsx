@@ -3,7 +3,7 @@ import type { SyntheticEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { apiRequest } from "../lib/api";
-import type { GiftItem, GiftList } from "../types/gift";
+import type { GiftItem, GiftList, GiftPriority } from "../types/gift";
 import type { GiftListDetailResponse } from "../types/list";
 
 type CreateGiftItemResponse = {
@@ -34,6 +34,7 @@ export function MyListDetailPage() {
   const [itemLink, setItemLink] = useState("");
   const [itemDescription, setItemDescription] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const [priority, setPriority] = useState<GiftPriority>("MEDIUM");
   const [alternatives, setAlternatives] = useState<AlternativeFormInput[]>([]);
 
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
@@ -44,6 +45,7 @@ export function MyListDetailPage() {
   const [editAlternatives, setEditAlternatives] = useState<
     AlternativeFormInput[]
   >([]);
+  const [editPriority, setEditPriority] = useState<GiftPriority>("MEDIUM");
 
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingItem, setIsCreatingItem] = useState(false);
@@ -194,6 +196,7 @@ export function MyListDetailPage() {
     setItemLink("");
     setItemDescription("");
     setQuantity(1);
+    setPriority("MEDIUM");
     setAlternatives([]);
   }
 
@@ -203,6 +206,7 @@ export function MyListDetailPage() {
     setEditItemLink(item.itemLink || "");
     setEditItemDescription(item.itemDescription || "");
     setEditQuantity(item.quantity);
+    setEditPriority(item.priority || "MEDIUM");
     setEditAlternatives(
       item.alternatives.map((alternative) => ({
         name: alternative.name,
@@ -220,6 +224,7 @@ export function MyListDetailPage() {
     setEditItemLink("");
     setEditItemDescription("");
     setEditQuantity(1);
+    setEditPriority("MEDIUM");
     setEditAlternatives([]);
   }
 
@@ -245,6 +250,7 @@ export function MyListDetailPage() {
           itemLink: itemLink.trim() ? itemLink : null,
           itemDescription: itemDescription.trim() ? itemDescription : null,
           quantity,
+          priority,
           alternatives: cleanAlternatives(alternatives)
         })
       });
@@ -285,6 +291,7 @@ export function MyListDetailPage() {
               ? editItemDescription
               : null,
             quantity: editQuantity,
+            priority: editPriority,
             alternatives: cleanAlternatives(editAlternatives)
           })
         }
@@ -337,6 +344,26 @@ export function MyListDetailPage() {
     }
   }
 
+function formatPriorityLabel(value?: GiftPriority | null) {
+  const safePriority = value || "MEDIUM";
+
+  if (safePriority === "HIGH") {
+    return "High";
+  }
+
+  if (safePriority === "LOW") {
+    return "Low";
+  }
+
+  return "Medium";
+}
+
+function getPriorityClass(value?: GiftPriority | null) {
+  const safePriority = value || "MEDIUM";
+
+  return `priority-badge ${safePriority.toLowerCase()}`;
+}
+
   return (
     <>
       <section className="hero-card">
@@ -373,155 +400,167 @@ export function MyListDetailPage() {
       )}
 
       <section className="list-detail-stack">
-               <form
-          className="settings-card add-item-panel compact-add-item-panel"
-          onSubmit={handleCreateGiftItem}
-        >
-          <div className="compact-add-item-header">
-            <div>
-              <p className="section-label">Add Item</p>
-              <h2>New gift idea</h2>
-              <p className="compact-add-item-copy">
-                This item will be added directly to{" "}
-                <strong>{giftList?.title || "this list"}</strong>.
-              </p>
-            </div>
-
-            <button
-              type="submit"
-              className="compact-add-item-submit"
-              disabled={isCreatingItem || !giftList}
-            >
-              {isCreatingItem ? "Adding Item..." : "Add Item to List"}
-            </button>
-          </div>
-
-          <div className="compact-add-item-grid">
-            <label className="compact-field">
-              Item name
-              <input
-                type="text"
-                value={itemName}
-                onChange={(event) => setItemName(event.target.value)}
-                placeholder="LEGO set, headphones, tool kit..."
-                maxLength={120}
-                required
-              />
-            </label>
-
-            <label className="compact-field">
-              Item link
-              <input
-                type="url"
-                value={itemLink}
-                onChange={(event) => setItemLink(event.target.value)}
-                placeholder="https://example.com/item"
-                maxLength={500}
-              />
-            </label>
-
-            <label className="compact-field compact-quantity">
-              Quantity
-              <input
-                type="number"
-                value={quantity}
-                onChange={(event) => setQuantity(Number(event.target.value))}
-                min={1}
-                max={99}
-                required
-              />
-            </label>
-
-            <label className="compact-field compact-description">
-              Description
-              <textarea
-                value={itemDescription}
-                onChange={(event) => setItemDescription(event.target.value)}
-                rows={2}
-                maxLength={1000}
-                placeholder="Optional notes, size, color, model, or preference details."
-              />
-            </label>
-          </div>
-
-          <details className="compact-alternatives-drawer">
-            <summary>
-              <span>Alternatives</span>
-              <small>Optional backup options</small>
-            </summary>
-
-            <div className="compact-alternatives-body">
-              <button
-                type="button"
-                className="secondary-button compact-button"
-                onClick={addAlternative}
-              >
-                Add Alternative
-              </button>
-
-              {alternatives.length === 0 ? (
-                <p className="hero-text compact-empty-text">
-                  No alternatives added.
+          <form
+            className="settings-card add-item-panel compact-add-item-panel"
+            onSubmit={handleCreateGiftItem}
+          >
+            <div className="compact-add-item-header">
+              <div>
+                <p className="section-label">Add Item</p>
+                <h2>New gift idea</h2>
+                <p className="compact-add-item-copy">
+                  This item will be added directly to{" "}
+                  <strong>{giftList?.title || "this list"}</strong>.
                 </p>
-              ) : (
-                <div className="alternative-form-list">
-                  {alternatives.map((alternative, index) => (
-                    <div className="alternative-form-card" key={index}>
-                      <label>
-                        Alternative name
-                        <input
-                          type="text"
-                          value={alternative.name}
-                          onChange={(event) =>
-                            updateAlternative(index, "name", event.target.value)
-                          }
-                          maxLength={120}
-                          required
-                        />
-                      </label>
+              </div>
 
-                      <label>
-                        Alternative link
-                        <input
-                          type="url"
-                          value={alternative.link}
-                          onChange={(event) =>
-                            updateAlternative(index, "link", event.target.value)
-                          }
-                          maxLength={500}
-                        />
-                      </label>
-
-                      <label>
-                        Alternative description
-                        <textarea
-                          value={alternative.description}
-                          onChange={(event) =>
-                            updateAlternative(
-                              index,
-                              "description",
-                              event.target.value
-                            )
-                          }
-                          rows={3}
-                          maxLength={500}
-                        />
-                      </label>
-
-                      <button
-                        type="button"
-                        className="secondary-button compact-button"
-                        onClick={() => removeAlternative(index)}
-                      >
-                        Remove Alternative
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <button
+                type="submit"
+                className="compact-add-item-submit"
+                disabled={isCreatingItem || !giftList}
+              >
+                {isCreatingItem ? "Adding Item..." : "Add Item to List"}
+              </button>
             </div>
-          </details>
-        </form>
+
+            <div className="compact-add-item-grid">
+              <label className="compact-field">
+                Item name
+                <input
+                  type="text"
+                  value={itemName}
+                  onChange={(event) => setItemName(event.target.value)}
+                  placeholder="LEGO set, headphones, tool kit..."
+                  maxLength={120}
+                  required
+                />
+              </label>
+
+              <label className="compact-field">
+                Item link
+                <input
+                  type="url"
+                  value={itemLink}
+                  onChange={(event) => setItemLink(event.target.value)}
+                  placeholder="https://example.com/item"
+                  maxLength={500}
+                />
+              </label>
+
+              <label className="compact-field compact-priority">
+                Priority
+                <select
+                  value={priority}
+                  onChange={(event) => setPriority(event.target.value as GiftPriority)}
+                >
+                  <option value="HIGH">High</option>
+                  <option value="MEDIUM">Medium</option>
+                  <option value="LOW">Low</option>
+                </select>
+              </label>
+
+              <label className="compact-field compact-quantity">
+                Quantity
+                <input
+                  type="number"
+                  value={quantity}
+                  onChange={(event) => setQuantity(Number(event.target.value))}
+                  min={1}
+                  max={99}
+                  required
+                />
+              </label>
+
+              <label className="compact-field compact-description">
+                Description
+                <textarea
+                  value={itemDescription}
+                  onChange={(event) => setItemDescription(event.target.value)}
+                  rows={2}
+                  maxLength={1000}
+                  placeholder="Optional notes, size, color, model, or preference details."
+                />
+              </label>
+            </div>
+
+            <details className="compact-alternatives-drawer">
+              <summary>
+                <span>Alternatives</span>
+                <small>Optional backup options</small>
+              </summary>
+
+              <div className="compact-alternatives-body">
+                <button
+                  type="button"
+                  className="secondary-button compact-button"
+                  onClick={addAlternative}
+                >
+                  Add Alternative
+                </button>
+
+                {alternatives.length === 0 ? (
+                  <p className="hero-text compact-empty-text">
+                    No alternatives added.
+                  </p>
+                ) : (
+                  <div className="alternative-form-list">
+                    {alternatives.map((alternative, index) => (
+                      <div className="alternative-form-card" key={index}>
+                        <label>
+                          Alternative name
+                          <input
+                            type="text"
+                            value={alternative.name}
+                            onChange={(event) =>
+                              updateAlternative(index, "name", event.target.value)
+                            }
+                            maxLength={120}
+                            required
+                          />
+                        </label>
+
+                        <label>
+                          Alternative link
+                          <input
+                            type="url"
+                            value={alternative.link}
+                            onChange={(event) =>
+                              updateAlternative(index, "link", event.target.value)
+                            }
+                            maxLength={500}
+                          />
+                        </label>
+
+                        <label>
+                          Alternative description
+                          <textarea
+                            value={alternative.description}
+                            onChange={(event) =>
+                              updateAlternative(
+                                index,
+                                "description",
+                                event.target.value
+                              )
+                            }
+                            rows={3}
+                            maxLength={500}
+                          />
+                        </label>
+
+                        <button
+                          type="button"
+                          className="secondary-button compact-button"
+                          onClick={() => removeAlternative(index)}
+                        >
+                          Remove Alternative
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </details>
+          </form>
 
         <section className="preview-table-card connected-list-card gift-ideas-panel">
           <div className="table-header">
@@ -554,6 +593,7 @@ export function MyListDetailPage() {
                   <tr>
                     <th>Item</th>
                     <th>Description</th>
+                    <th>Priority</th>
                     <th>Qty</th>
                     <th>Link</th>
                     <th>Status</th>
@@ -570,7 +610,7 @@ export function MyListDetailPage() {
                     if (isEditing) {
                       return (
                         <tr className="gift-ideas-edit-row" key={item.id}>
-                          <td colSpan={6}>
+                          <td colSpan={7}>
                             <article className="gift-item-card editing">
                               <form
                                 className="item-edit-form"
@@ -634,6 +674,18 @@ export function MyListDetailPage() {
                                     max={99}
                                     required
                                   />
+                                </label>
+
+                                <label className="edit-priority-field">
+                                 Priority
+                                  <select
+                                    value={editPriority}
+                                    onChange={(event) => setEditPriority(event.target.value as GiftPriority)}
+                                  >
+                                    <option value="HIGH">High</option>
+                                    <option value="MEDIUM">Medium</option>
+                                    <option value="LOW">Low</option>
+                                  </select>
                                 </label>
 
                                 <div className="alternative-form-section">
@@ -763,6 +815,12 @@ export function MyListDetailPage() {
                           ) : (
                             <span className="table-muted">No description</span>
                           )}
+                        </td>
+
+                        <td>
+                          <span className={getPriorityClass(item.priority)}>
+                            {formatPriorityLabel(item.priority)}
+                          </span>
                         </td>
 
                         <td>{item.quantity}</td>

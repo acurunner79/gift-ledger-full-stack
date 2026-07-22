@@ -26,11 +26,14 @@ const giftAlternativeSchema = z.object({
   description: z.string().trim().max(500).optional().nullable()
 });
 
+const giftPrioritySchema = z.enum(["HIGH", "MEDIUM", "LOW"]);
+
 const createGiftItemSchema = z.object({
   itemName: z.string().trim().min(1).max(120),
   itemLink: z.string().trim().max(500).optional().nullable(),
   itemDescription: z.string().trim().max(1000).optional().nullable(),
   quantity: z.number().int().min(1).max(99).default(1),
+  priority: giftPrioritySchema.default("MEDIUM"),
   alternatives: z.array(giftAlternativeSchema).optional().default([])
 });
 
@@ -39,6 +42,7 @@ const updateGiftItemSchema = z.object({
   itemLink: z.string().trim().max(500).optional().nullable(),
   itemDescription: z.string().trim().max(1000).optional().nullable(),
   quantity: z.number().int().min(1).max(99).optional(),
+  priority: giftPrioritySchema.optional(),
   alternatives: z.array(giftAlternativeSchema).optional()
 });
 
@@ -297,6 +301,7 @@ listRouter.post(
         itemLink: normalizeOptionalText(parsed.data.itemLink),
         itemDescription: normalizeOptionalText(parsed.data.itemDescription),
         quantity: parsed.data.quantity,
+        priority: parsed.data.priority,
         alternatives: {
           create: parsed.data.alternatives.map((alternative, index) => ({
             name: alternative.name,
@@ -384,7 +389,10 @@ listRouter.patch(
       }),
       ...(parsed.data.quantity !== undefined && {
         quantity: parsed.data.quantity
-      })
+      }),
+      ...(parsed.data.priority !== undefined && {
+        priority: parsed.data.priority
+      }),
     };
 
     if (parsed.data.alternatives !== undefined) {

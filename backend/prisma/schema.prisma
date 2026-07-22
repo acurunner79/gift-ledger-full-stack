@@ -76,6 +76,7 @@ model GiftItem {
   itemLink        String?
   itemDescription String?
   quantity        Int               @default(1)
+  priority        GiftPriority      @default(MEDIUM)
   isActive        Boolean           @default(true)
 
   alternatives    GiftAlternative[]
@@ -136,4 +137,10 @@ enum ClaimStatus {
   RESERVED
   PURCHASED
   CANCELLED
+}
+
+enum GiftPriority {
+  HIGH
+  MEDIUM
+  LOW
 }
