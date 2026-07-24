@@ -57,9 +57,15 @@ export function LoginPage() {
         <button type="submit">Login</button>
       </form>
 
-      <p className="auth-switch">
-        No account yet? <Link to="/register">Create one</Link>
-      </p>
+      <div className="auth-switch">
+        <p>
+          No account yet? <Link to="/register">Create one</Link>
+        </p>
+
+        <p>
+          Forgot your password? <Link to="/forgot-password">Reset it</Link>
+        </p>
+      </div>
     </section>
   );
 }

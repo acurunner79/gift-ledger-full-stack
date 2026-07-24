@@ -22,9 +22,27 @@ model User {
   connectionsAsA         UserConnection[] @relation("UserAConnections")
   connectionsAsB         UserConnection[] @relation("UserBConnections")
   requestedConnections   UserConnection[] @relation("RequestedConnections")
+  passwordResetTokens    PasswordResetToken[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model UserConnection {

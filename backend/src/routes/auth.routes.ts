@@ -1,6 +1,8 @@
+import { createHash, randomBytes } from "node:crypto";
 import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
+import { sendPasswordResetEmail } from "../lib/email.js";
 import {
   requireAuth,
   type AuthenticatedRequest
@@ -19,6 +21,15 @@ const registerSchema = z.object({
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1)
+});
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email()
+});
+
+const resetPasswordSchema = z.object({
+  token: z.string().min(32),
+  password: z.string().min(8).max(120)
 });
 
 authRouter.post("/register", async (req, res) => {
@@ -141,6 +152,150 @@ authRouter.post("/login", async (req, res) => {
       createdAt: user.createdAt
     },
     token
+  });
+});
+
+authRouter.post("/forgot-password", async (req, res) => {
+  const parsed = forgotPasswordSchema.safeParse(req.body);
+
+  if (!parsed.success) {
+    res.status(400).json({
+      message: "Invalid email address",
+      errors: parsed.error.flatten()
+    });
+    return;
+  }
+
+  const email = parsed.data.email.toLowerCase().trim();
+
+  const genericResponse = {
+    message:
+      "If an account exists for that email, a password reset link will be sent."
+  };
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      email: true
+    }
+  });
+
+  if (!user) {
+    res.json(genericResponse);
+    return;
+  }
+
+  const rawToken = randomBytes(32).toString("hex");
+  const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+  await prisma.passwordResetToken.updateMany({
+    where: {
+      userId: user.id,
+      usedAt: null,
+      expiresAt: {
+        gt: new Date()
+      }
+    },
+    data: {
+      usedAt: new Date()
+    }
+  });
+
+  await prisma.passwordResetToken.create({
+    data: {
+      userId: user.id,
+      tokenHash,
+      expiresAt
+    }
+  });
+
+  const frontendOrigin =
+    req.get("origin") ||
+    process.env.PASSWORD_RESET_FRONTEND_URL ||
+    process.env.FRONTEND_ORIGIN?.split(",")[0] ||
+    "http://localhost:5173";
+
+  const resetUrl = `${frontendOrigin}/reset-password?token=${rawToken}`;
+
+  await sendPasswordResetEmail({
+    to: user.email,
+    resetUrl
+  });
+
+  res.json(genericResponse);
+  });
+
+authRouter.post("/reset-password", async (req, res) => {
+  const parsed = resetPasswordSchema.safeParse(req.body);
+
+  if (!parsed.success) {
+    res.status(400).json({
+      message: "Invalid password reset data",
+      errors: parsed.error.flatten()
+    });
+    return;
+  }
+
+  const tokenHash = createHash("sha256")
+    .update(parsed.data.token)
+    .digest("hex");
+
+  const resetToken = await prisma.passwordResetToken.findUnique({
+    where: { tokenHash },
+    include: {
+      user: true
+    }
+  });
+
+  if (
+    !resetToken ||
+    resetToken.usedAt ||
+    resetToken.expiresAt.getTime() <= Date.now()
+  ) {
+    res.status(400).json({
+      message: "This password reset link is invalid or has expired."
+    });
+    return;
+  }
+
+  const passwordHash = await hashPassword(parsed.data.password);
+  const usedAt = new Date();
+
+  await prisma.$transaction([
+    prisma.user.update({
+      where: {
+        id: resetToken.userId
+      },
+      data: {
+        passwordHash
+      }
+    }),
+    prisma.passwordResetToken.update({
+      where: {
+        id: resetToken.id
+      },
+      data: {
+        usedAt
+      }
+    }),
+    prisma.passwordResetToken.updateMany({
+      where: {
+        userId: resetToken.userId,
+        usedAt: null,
+        id: {
+          not: resetToken.id
+        }
+      },
+      data: {
+        usedAt
+      }
+    })
+  ]);
+
+  res.json({
+    message: "Password has been reset successfully."
   });
 });
 

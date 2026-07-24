@@ -6,6 +6,8 @@ import { ConnectedUserGiftListPage } from "./pages/ConnectedUserGiftListPage";
 import { ConnectionsPage } from "./pages/ConnectionsPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
+import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { MyListDetailPage } from "./pages/MyListDetailPage";
 import { MyListsPage } from "./pages/MyListsPage";
 import { RegisterPage } from "./pages/RegisterPage";
@@ -20,6 +22,8 @@ function App() {
       <Route element={<PublicLayout />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
       </Route>
 
       <Route
