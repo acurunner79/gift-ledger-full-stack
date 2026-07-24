@@ -357,6 +357,18 @@ export function MyListDetailPage() {
     }
   }
 
+function formatOccasionDate(value: string | null) {
+  if (!value) {
+    return "No date";
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  }).format(new Date(value));
+}
+
 function formatPriorityLabel(value?: GiftPriority | null) {
   const safePriority = value || "MEDIUM";
 
@@ -470,14 +482,24 @@ const filteredGiftItems = getFilteredAndSortedGiftItems();
                 "Review and add gift ideas stored in this list."}
             </p>
 
-            {giftList?.occasion && (
-              <span className="status-pill">{giftList.occasion}</span>
-            )}
-          </div>
+            {(giftList?.occasion || giftList?.occasionDate) && (
+              <div className="list-meta-row">
+                {giftList.occasion && (
+                  <span className="status-pill">{giftList.occasion}</span>
+                )}
 
-          <Link className="button-link secondary-button" to="/lists">
-            Back to My Lists
-          </Link>
+                {giftList.occasionDate && (
+                  <span className="status-pill">
+                    {formatOccasionDate(giftList.occasionDate)}
+                  </span>
+                )}
+              </div>
+            )}
+
+            <Link className="button-link secondary-button" to="/lists">
+              Back to My Lists
+            </Link>
+          </div>
         </div>
       </section>
 

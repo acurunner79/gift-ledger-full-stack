@@ -15,6 +15,32 @@ import type {
   ConnectedGiftListsResponse
 } from "../types/list";
 
+function formatOccasionDate(value: string | null) {
+  if (!value) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  }).format(new Date(value));
+}
+
+function formatListSummaryMeta(
+  occasion: string | null,
+  occasionDate: string | null,
+  itemCount: number
+) {
+  const dateLabel = formatOccasionDate(occasionDate);
+
+  return [
+    occasion || "General",
+    ...(dateLabel ? [dateLabel] : []),
+    `${itemCount} items`
+  ].join(" · ");
+}
+
 export function ConnectionsPage() {
   const { token } = useAuth();
 
@@ -400,8 +426,11 @@ export function ConnectionsPage() {
                               <div>
                                 <strong>{giftList.title}</strong>
                                 <span>
-                                  {giftList.occasion || "General"} ·{" "}
-                                  {giftList._count.items} items
+                                  {formatListSummaryMeta(
+                                    giftList.occasion,
+                                    giftList.occasionDate,
+                                    giftList._count.items
+                                  )}
                                 </span>
                               </div>
 

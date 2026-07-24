@@ -435,6 +435,18 @@ th {
   align-items: start;
 }
 
+.list-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.list-meta-row .status-pill {
+  margin: 0;
+}
+
 .gift-form {
   position: sticky;
   top: 24px;
@@ -2362,7 +2374,8 @@ select:disabled {
 
   .list-library-table td:nth-child(2),
   .list-library-table td:nth-child(3),
-  .list-library-table td:nth-child(4) {
+  .list-library-table td:nth-child(4),
+  .list-library-table td:nth-child(5) {
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) auto !important;
     align-items: center !important;
@@ -2376,16 +2389,21 @@ select:disabled {
   }
 
   .list-library-table td:nth-child(3)::before {
-    content: "Items" !important;
+    content: "Date" !important;
   }
 
   .list-library-table td:nth-child(4)::before {
+    content: "Items" !important;
+  }
+
+  .list-library-table td:nth-child(5)::before {
     content: "Status" !important;
   }
 
   .list-library-table td:nth-child(2)::before,
   .list-library-table td:nth-child(3)::before,
-  .list-library-table td:nth-child(4)::before {
+  .list-library-table td:nth-child(4)::before,
+  .list-library-table td:nth-child(5)::before {
     display: block !important;
     color: var(--color-muted-text) !important;
     font-size: 0.72rem !important;
@@ -2396,7 +2414,8 @@ select:disabled {
 
   .list-library-table td:nth-child(2) > *,
   .list-library-table td:nth-child(3) > *,
-  .list-library-table td:nth-child(4) > * {
+  .list-library-table td:nth-child(4) > *,
+  .list-library-table td:nth-child(5) > * {
     justify-self: end !important;
     text-align: right !important;
   }

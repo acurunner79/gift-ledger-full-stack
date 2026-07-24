@@ -146,7 +146,7 @@ export function ConnectedUserGiftListPage() {
     }));
   }
 
-  function getClaimStatusLabel(item: GiftItem) {
+function getClaimStatusLabel(item: GiftItem) {
     const availableQuantity = getAvailableQuantity(item);
     const reservedQuantity = getReservedQuantity(item);
     const purchasedQuantity = getPurchasedQuantity(item);
@@ -205,7 +205,7 @@ export function ConnectedUserGiftListPage() {
     return `${availableQuantity} available`;
   }
 
-  function getClaimStatusClass(item: GiftItem) {
+function getClaimStatusClass(item: GiftItem) {
     const availableQuantity = getAvailableQuantity(item);
     const reservedQuantity = getReservedQuantity(item);
     const purchasedQuantity = getPurchasedQuantity(item);
@@ -236,7 +236,7 @@ export function ConnectedUserGiftListPage() {
     return "available-pill";
   }
 
-  function formatPriorityLabel(value?: GiftPriority | null) {
+function formatPriorityLabel(value?: GiftPriority | null) {
   const safePriority = value || "MEDIUM";
 
   if (safePriority === "HIGH") {
@@ -248,6 +248,18 @@ export function ConnectedUserGiftListPage() {
   }
 
   return "Medium";
+}
+
+function formatOccasionDate(value: string | null) {
+  if (!value) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  }).format(new Date(value));
 }
 
 function getPriorityClass(value?: GiftPriority | null) {
@@ -589,6 +601,9 @@ function getFilteredAndSortedGiftItems() {
               <p className="hero-text">
                 Viewing: <strong>{giftList.title}</strong>
                 {giftList.occasion ? ` · ${giftList.occasion}` : ""}
+                {giftList.occasionDate
+                  ? ` · ${formatOccasionDate(giftList.occasionDate)}`
+                  : ""}
               </p>
             )}
 

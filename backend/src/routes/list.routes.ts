@@ -8,16 +8,25 @@ import {
 
 export const listRouter = Router();
 
+const optionalDateSchema = z
+  .string()
+  .trim()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD date format")
+  .optional()
+  .nullable();
+
 const createGiftListSchema = z.object({
   title: z.string().trim().min(1).max(80),
   description: z.string().trim().max(500).optional().nullable(),
-  occasion: z.string().trim().max(80).optional().nullable()
+  occasion: z.string().trim().max(80).optional().nullable(),
+  occasionDate: optionalDateSchema
 });
 
 const updateGiftListSchema = z.object({
   title: z.string().trim().min(1).max(80).optional(),
   description: z.string().trim().max(500).optional().nullable(),
-  occasion: z.string().trim().max(80).optional().nullable()
+  occasion: z.string().trim().max(80).optional().nullable(),
+  occasionDate: optionalDateSchema
 });
 
 const giftAlternativeSchema = z.object({
@@ -58,6 +67,22 @@ function normalizeOptionalText(value: string | null | undefined) {
   const trimmedValue = value.trim();
 
   return trimmedValue.length > 0 ? trimmedValue : null;
+}
+
+function normalizeOptionalDate(value: string | null | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  const trimmedValue = value.trim();
+
+  if (!trimmedValue) {
+    return null;
+  }
+
+  const dateValue = new Date(`${trimmedValue}T12:00:00.000Z`);
+
+  return Number.isNaN(dateValue.getTime()) ? null : dateValue;
 }
 
 listRouter.get("/", requireAuth, async (req: AuthenticatedRequest, res) => {
@@ -126,6 +151,7 @@ listRouter.post("/", requireAuth, async (req: AuthenticatedRequest, res) => {
       title: parsed.data.title,
       description: normalizeOptionalText(parsed.data.description),
       occasion: normalizeOptionalText(parsed.data.occasion),
+      occasionDate: normalizeOptionalDate(parsed.data.occasionDate),
       isDefault: false
     },
     include: {
@@ -635,6 +661,9 @@ listRouter.patch(
         }),
         ...(parsed.data.occasion !== undefined && {
           occasion: normalizeOptionalText(parsed.data.occasion)
+        }),
+        ...(parsed.data.occasionDate !== undefined && {
+          occasionDate: normalizeOptionalDate(parsed.data.occasionDate)
         })
       },
       include: {

@@ -18,11 +18,13 @@ export function MyListsPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [occasion, setOccasion] = useState("");
+  const [occasionDate, setOccasionDate] = useState("");
 
   const [editingListId, setEditingListId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editOccasion, setEditOccasion] = useState("");
+  const [editOccasionDate, setEditOccasionDate] = useState("");
 
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
@@ -33,6 +35,18 @@ export function MyListsPage() {
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  function formatOccasionDate(value: string | null) {
+    if (!value) {
+      return "No date";
+    }
+
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    }).format(new Date(value));
+  }
 
   async function loadGiftLists() {
     if (!token) {
@@ -106,13 +120,15 @@ export function MyListsPage() {
         body: JSON.stringify({
           title,
           description: description.trim() ? description : null,
-          occasion: occasion.trim() ? occasion : null
+          occasion: occasion.trim() ? occasion : null,
+          occasionDate: occasionDate || null
         })
       });
 
       setTitle("");
       setDescription("");
       setOccasion("");
+      setOccasionDate("");
       setMessage("Gift list created.");
       await loadGiftLists();
     } catch (err) {
@@ -127,6 +143,9 @@ export function MyListsPage() {
     setEditTitle(giftList.title);
     setEditDescription(giftList.description || "");
     setEditOccasion(giftList.occasion || "");
+    setEditOccasionDate(
+      giftList.occasionDate ? giftList.occasionDate.slice(0, 10) : ""
+    );
     setMessage("");
     setError("");
   }
@@ -136,6 +155,7 @@ export function MyListsPage() {
     setEditTitle("");
     setEditDescription("");
     setEditOccasion("");
+    setEditOccasionDate("");
   }
 
   async function handleUpdateList(event: SyntheticEvent<HTMLFormElement>) {
@@ -158,7 +178,8 @@ export function MyListsPage() {
         body: JSON.stringify({
           title: editTitle,
           description: editDescription.trim() ? editDescription : null,
-          occasion: editOccasion.trim() ? editOccasion : null
+          occasion: editOccasion.trim() ? editOccasion : null,
+          occasionDate: editOccasionDate || null
         })
       });
 
@@ -260,6 +281,15 @@ export function MyListsPage() {
           </label>
 
           <label>
+            Occasion date
+            <input
+              type="date"
+              value={occasionDate}
+              onChange={(event) => setOccasionDate(event.target.value)}
+            />
+          </label>
+
+          <label>
             Description
             <textarea
               value={description}
@@ -299,6 +329,7 @@ export function MyListsPage() {
               <tr>
                 <th>List</th>
                 <th>Occasion</th>
+                <th>Date</th>
                 <th>Items</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -314,7 +345,7 @@ export function MyListsPage() {
                 if (isEditing) {
                   return (
                     <tr className="list-library-edit-row" key={giftList.id}>
-                      <td colSpan={5}>
+                      <td colSpan={6}>
                         <form
                           className="list-library-card editing"
                           onSubmit={handleUpdateList}
@@ -337,6 +368,15 @@ export function MyListsPage() {
                               value={editOccasion}
                               onChange={(event) => setEditOccasion(event.target.value)}
                               maxLength={80}
+                            />
+                          </label>
+
+                          <label>
+                            Occasion date
+                            <input
+                              type="date"
+                              value={editOccasionDate}
+                              onChange={(event) => setEditOccasionDate(event.target.value)}
                             />
                           </label>
 
@@ -387,6 +427,8 @@ export function MyListsPage() {
                     <td>
                       <strong>{giftList.occasion || "General"}</strong>
                     </td>
+
+                    <td>{formatOccasionDate(giftList.occasionDate)}</td>
 
                     <td>
                       <strong>{giftList._count.items}</strong>

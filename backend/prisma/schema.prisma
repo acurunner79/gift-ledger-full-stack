@@ -73,6 +73,7 @@ model GiftList {
   title       String
   description String?
   occasion    String?
+  occasionDate DateTime?
   isDefault   Boolean    @default(false)
 
   items       GiftItem[]

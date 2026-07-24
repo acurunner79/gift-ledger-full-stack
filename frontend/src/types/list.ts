@@ -7,6 +7,7 @@ export type GiftListSummary = {
   title: string;
   description: string | null;
   occasion: string | null;
+  occasionDate: string | null;
   isDefault: boolean;
   createdAt: string;
   updatedAt: string;
