@@ -3,7 +3,7 @@ import type { SyntheticEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { apiRequest } from "../lib/api";
-import type { GiftItem, GiftList, GiftPriority } from "../types/gift";
+import type { GiftItem, GiftItemStatus,GiftList, GiftPriority } from "../types/gift";
 import type { GiftListDetailResponse } from "../types/list";
 
 type CreateGiftItemResponse = {
@@ -44,6 +44,7 @@ export function MyListDetailPage() {
   const [itemDescription, setItemDescription] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [priority, setPriority] = useState<GiftPriority>("MEDIUM");
+  const [status, setStatus] = useState<GiftItemStatus>("ACTIVE");
   const [alternatives, setAlternatives] = useState<AlternativeFormInput[]>([]);
 
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
@@ -55,6 +56,7 @@ export function MyListDetailPage() {
     AlternativeFormInput[]
   >([]);
   const [editPriority, setEditPriority] = useState<GiftPriority>("MEDIUM");
+  const [editStatus, setEditStatus] = useState<GiftItemStatus>("ACTIVE");
 
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingItem, setIsCreatingItem] = useState(false);
@@ -210,6 +212,7 @@ export function MyListDetailPage() {
     setItemDescription("");
     setQuantity(1);
     setPriority("MEDIUM");
+    setStatus("ACTIVE");
     setAlternatives([]);
   }
 
@@ -220,6 +223,7 @@ export function MyListDetailPage() {
     setEditItemDescription(item.itemDescription || "");
     setEditQuantity(item.quantity);
     setEditPriority(item.priority || "MEDIUM");
+    setEditStatus(item.status || "ACTIVE");
     setEditAlternatives(
       item.alternatives.map((alternative) => ({
         name: alternative.name,
@@ -238,6 +242,7 @@ export function MyListDetailPage() {
     setEditItemDescription("");
     setEditQuantity(1);
     setEditPriority("MEDIUM");
+    setEditStatus("ACTIVE");
     setEditAlternatives([]);
   }
 
@@ -264,6 +269,7 @@ export function MyListDetailPage() {
           itemDescription: itemDescription.trim() ? itemDescription : null,
           quantity,
           priority,
+          status,
           alternatives: cleanAlternatives(alternatives)
         })
       });
@@ -305,6 +311,7 @@ export function MyListDetailPage() {
               : null,
             quantity: editQuantity,
             priority: editPriority,
+            status: editStatus,
             alternatives: cleanAlternatives(editAlternatives)
           })
         }
@@ -381,6 +388,26 @@ function formatPriorityLabel(value?: GiftPriority | null) {
   }
 
   return "Medium";
+}
+
+function formatItemStatusLabel(value?: GiftItemStatus | null) {
+  const safeStatus = value || "ACTIVE";
+
+  if (safeStatus === "RECEIVED") {
+    return "Received";
+  }
+
+  if (safeStatus === "ON_HOLD") {
+    return "On Hold";
+  }
+
+  return "Active";
+}
+
+function getItemStatusClass(value?: GiftItemStatus | null) {
+  const safeStatus = value || "ACTIVE";
+
+  return `item-status-pill ${safeStatus.toLowerCase().replace("_", "-")}`;
 }
 
 function getPriorityClass(value?: GiftPriority | null) {
@@ -572,6 +599,18 @@ const filteredGiftItems = getFilteredAndSortedGiftItems();
                   <option value="HIGH">High</option>
                   <option value="MEDIUM">Medium</option>
                   <option value="LOW">Low</option>
+                </select>
+              </label>
+
+              <label className="compact-field">
+                Status
+                <select
+                  value={status}
+                  onChange={(event) => setStatus(event.target.value as GiftItemStatus)}
+                >
+                  <option value="ACTIVE">Active</option>
+                  <option value="RECEIVED">Received</option>
+                  <option value="ON_HOLD">On Hold</option>
                 </select>
               </label>
 
@@ -858,6 +897,18 @@ const filteredGiftItems = getFilteredAndSortedGiftItems();
                                   </select>
                                 </label>
 
+                                <label>
+                                  Status
+                                  <select
+                                    value={editStatus}
+                                    onChange={(event) => setEditStatus(event.target.value as GiftItemStatus)}
+                                  >
+                                    <option value="ACTIVE">Active</option>
+                                    <option value="RECEIVED">Received</option>
+                                    <option value="ON_HOLD">On Hold</option>
+                                  </select>
+                                </label>
+
                                 <div className="alternative-form-section">
                                   <div className="alternative-form-header">
                                     <div>
@@ -1006,7 +1057,9 @@ const filteredGiftItems = getFilteredAndSortedGiftItems();
                         </td>
 
                         <td>
-                          <span className="status-pill">Active</span>
+                          <span className={getItemStatusClass(item.status)}>
+                            {formatItemStatusLabel(item.status)}
+                          </span>
                         </td>
 
                         <td>

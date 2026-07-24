@@ -7,6 +7,7 @@ import type {
   ConnectedUserGiftListResponse,
   GiftClaimResponse,
   GiftItem,
+  GiftItemStatus,
   GiftList,
   GiftPriority
 } from "../types/gift";
@@ -280,6 +281,26 @@ function getPriorityRank(value?: GiftPriority | null) {
   }
 
   return 3;
+}
+
+function formatItemStatusLabel(value?: GiftItemStatus | null) {
+  const safeStatus = value || "ACTIVE";
+
+  if (safeStatus === "RECEIVED") {
+    return "Received";
+  }
+
+  if (safeStatus === "ON_HOLD") {
+    return "On Hold";
+  }
+
+  return "Active";
+}
+
+function getItemStatusClass(value?: GiftItemStatus | null) {
+  const safeStatus = value || "ACTIVE";
+
+  return `item-status-pill ${safeStatus.toLowerCase().replace("_", "-")}`;
 }
 
 function getFilteredAndSortedGiftItems() {
@@ -717,6 +738,10 @@ function getFilteredAndSortedGiftItems() {
                     <div className="connected-item-meta">
                       <span className={getPriorityClass(item.priority)}>
                         {formatPriorityLabel(item.priority)}
+                      </span>
+
+                      <span className={getItemStatusClass(item.status)}>
+                        {formatItemStatusLabel(item.status)}
                       </span>
 
                       <p>Quantity wanted: {item.quantity}</p>

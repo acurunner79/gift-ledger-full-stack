@@ -2,6 +2,8 @@ import type { ConnectionUser } from "./connection";
 
 export type GiftPriority = "HIGH" | "MEDIUM" | "LOW";
 
+export type GiftItemStatus = "ACTIVE" | "RECEIVED" | "ON_HOLD";
+
 export type GiftAlternative = {
   id: string;
   giftItemId: string;
@@ -22,6 +24,7 @@ export type GiftItem = {
   itemDescription: string | null;
   quantity: number;
   priority: GiftPriority;
+  status: GiftItemStatus;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

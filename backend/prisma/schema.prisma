@@ -96,6 +96,7 @@ model GiftItem {
   itemDescription String?
   quantity        Int               @default(1)
   priority        GiftPriority      @default(MEDIUM)
+  status          GiftItemStatus    @default(ACTIVE)
   isActive        Boolean           @default(true)
 
   alternatives    GiftAlternative[]
@@ -162,4 +163,10 @@ enum GiftPriority {
   HIGH
   MEDIUM
   LOW
+}
+
+enum GiftItemStatus {
+  ACTIVE
+  RECEIVED
+  ON_HOLD
 }

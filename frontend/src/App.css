@@ -66,7 +66,7 @@ h2 {
 
 button {
   border: 0;
-  border-radius: 999px;
+  border-radius: 20px;
   background: var(--color-primary);
   color: white;
   padding: 12px 20px;
@@ -2455,6 +2455,39 @@ select:disabled {
   }
 }
 
+/* Gift item status UI */
+.item-status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 86px;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.item-status-pill.active {
+  color: var(--color-success);
+  border-color: var(--color-success);
+  background: color-mix(in srgb, var(--color-success) 12%, transparent);
+}
+
+.item-status-pill.received {
+  color: var(--color-muted-text);
+  border-color: var(--color-border);
+  background: var(--color-surface);
+}
+
+.item-status-pill.on-hold {
+  color: var(--color-warning);
+  border-color: var(--color-warning);
+  background: color-mix(in srgb, var(--color-warning) 14%, transparent);
+}
+
 /* Gift item priority UI */
 .priority-badge {
   display: inline-flex;
@@ -2929,6 +2962,7 @@ select option {
   .gift-ideas-table td:nth-child(3) .priority-badge,
   .gift-ideas-table td:nth-child(5) a,
   .gift-ideas-table td:nth-child(6) .status-pill,
+  .gift-ideas-table td:nth-child(6) .item-status-pill,
   .gift-ideas-table td:nth-child(7) .table-actions {
     margin-left: auto;
     margin-right: auto;

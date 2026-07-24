@@ -37,12 +37,15 @@ const giftAlternativeSchema = z.object({
 
 const giftPrioritySchema = z.enum(["HIGH", "MEDIUM", "LOW"]);
 
+const giftItemStatusSchema = z.enum(["ACTIVE", "RECEIVED", "ON_HOLD"]);
+
 const createGiftItemSchema = z.object({
   itemName: z.string().trim().min(1).max(120),
   itemLink: z.string().trim().max(500).optional().nullable(),
   itemDescription: z.string().trim().max(1000).optional().nullable(),
   quantity: z.number().int().min(1).max(99).default(1),
   priority: giftPrioritySchema.default("MEDIUM"),
+  status: giftItemStatusSchema.default("ACTIVE"),
   alternatives: z.array(giftAlternativeSchema).optional().default([])
 });
 
@@ -52,6 +55,7 @@ const updateGiftItemSchema = z.object({
   itemDescription: z.string().trim().max(1000).optional().nullable(),
   quantity: z.number().int().min(1).max(99).optional(),
   priority: giftPrioritySchema.optional(),
+  status: giftItemStatusSchema.optional(),
   alternatives: z.array(giftAlternativeSchema).optional()
 });
 
@@ -328,6 +332,7 @@ listRouter.post(
         itemDescription: normalizeOptionalText(parsed.data.itemDescription),
         quantity: parsed.data.quantity,
         priority: parsed.data.priority,
+        status: parsed.data.status,
         alternatives: {
           create: parsed.data.alternatives.map((alternative, index) => ({
             name: alternative.name,
@@ -418,6 +423,9 @@ listRouter.patch(
       }),
       ...(parsed.data.priority !== undefined && {
         priority: parsed.data.priority
+      }),
+      ...(parsed.data.status !== undefined && {
+        status: parsed.data.status
       }),
     };
 
