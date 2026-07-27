@@ -39,11 +39,35 @@ const giftPrioritySchema = z.enum(["HIGH", "MEDIUM", "LOW"]);
 
 const giftItemStatusSchema = z.enum(["ACTIVE", "RECEIVED", "ON_HOLD"]);
 
+const optionalPriceSchema = z.preprocess(
+  (value) => {
+    if (value === "" || value === null || value === undefined) {
+      return null;
+    }
+
+    if (typeof value === "number") {
+      return String(value);
+    }
+
+    if (typeof value === "string") {
+      return value.trim();
+    }
+
+    return value;
+  },
+  z
+    .string()
+    .regex(/^\d{1,8}(\.\d{1,2})?$/, "Use a valid price up to 99999999.99")
+    .optional()
+    .nullable()
+);
+
 const createGiftItemSchema = z.object({
   itemName: z.string().trim().min(1).max(120),
   itemLink: z.string().trim().max(500).optional().nullable(),
   itemDescription: z.string().trim().max(1000).optional().nullable(),
   quantity: z.number().int().min(1).max(99).default(1),
+  estimatedPrice: optionalPriceSchema,
   priority: giftPrioritySchema.default("MEDIUM"),
   status: giftItemStatusSchema.default("ACTIVE"),
   alternatives: z.array(giftAlternativeSchema).optional().default([])
@@ -54,6 +78,7 @@ const updateGiftItemSchema = z.object({
   itemLink: z.string().trim().max(500).optional().nullable(),
   itemDescription: z.string().trim().max(1000).optional().nullable(),
   quantity: z.number().int().min(1).max(99).optional(),
+  estimatedPrice: optionalPriceSchema,
   priority: giftPrioritySchema.optional(),
   status: giftItemStatusSchema.optional(),
   alternatives: z.array(giftAlternativeSchema).optional()
@@ -87,6 +112,14 @@ function normalizeOptionalDate(value: string | null | undefined) {
   const dateValue = new Date(`${trimmedValue}T12:00:00.000Z`);
 
   return Number.isNaN(dateValue.getTime()) ? null : dateValue;
+}
+
+function normalizeOptionalPrice(value: string | null | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  return value;
 }
 
 listRouter.get("/", requireAuth, async (req: AuthenticatedRequest, res) => {
@@ -331,6 +364,7 @@ listRouter.post(
         itemLink: normalizeOptionalText(parsed.data.itemLink),
         itemDescription: normalizeOptionalText(parsed.data.itemDescription),
         quantity: parsed.data.quantity,
+        estimatedPrice: normalizeOptionalPrice(parsed.data.estimatedPrice),
         priority: parsed.data.priority,
         status: parsed.data.status,
         alternatives: {
@@ -420,6 +454,9 @@ listRouter.patch(
       }),
       ...(parsed.data.quantity !== undefined && {
         quantity: parsed.data.quantity
+      }),
+      ...(parsed.data.estimatedPrice !== undefined && {
+        estimatedPrice: normalizeOptionalPrice(parsed.data.estimatedPrice)
       }),
       ...(parsed.data.priority !== undefined && {
         priority: parsed.data.priority

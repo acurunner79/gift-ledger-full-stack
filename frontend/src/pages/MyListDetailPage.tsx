@@ -43,6 +43,7 @@ export function MyListDetailPage() {
   const [itemLink, setItemLink] = useState("");
   const [itemDescription, setItemDescription] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const [estimatedPrice, setEstimatedPrice] = useState("");
   const [priority, setPriority] = useState<GiftPriority>("MEDIUM");
   const [status, setStatus] = useState<GiftItemStatus>("ACTIVE");
   const [alternatives, setAlternatives] = useState<AlternativeFormInput[]>([]);
@@ -52,6 +53,7 @@ export function MyListDetailPage() {
   const [editItemLink, setEditItemLink] = useState("");
   const [editItemDescription, setEditItemDescription] = useState("");
   const [editQuantity, setEditQuantity] = useState(1);
+  const [editEstimatedPrice, setEditEstimatedPrice] = useState("");
   const [editAlternatives, setEditAlternatives] = useState<
     AlternativeFormInput[]
   >([]);
@@ -211,6 +213,7 @@ export function MyListDetailPage() {
     setItemLink("");
     setItemDescription("");
     setQuantity(1);
+    setEstimatedPrice("");
     setPriority("MEDIUM");
     setStatus("ACTIVE");
     setAlternatives([]);
@@ -241,6 +244,7 @@ export function MyListDetailPage() {
     setEditItemLink("");
     setEditItemDescription("");
     setEditQuantity(1);
+    setEditEstimatedPrice("");
     setEditPriority("MEDIUM");
     setEditStatus("ACTIVE");
     setEditAlternatives([]);
@@ -268,6 +272,7 @@ export function MyListDetailPage() {
           itemLink: itemLink.trim() ? itemLink : null,
           itemDescription: itemDescription.trim() ? itemDescription : null,
           quantity,
+          estimatedPrice: estimatedPrice || null,
           priority,
           status,
           alternatives: cleanAlternatives(alternatives)
@@ -310,6 +315,7 @@ export function MyListDetailPage() {
               ? editItemDescription
               : null,
             quantity: editQuantity,
+            estimatedPrice: editEstimatedPrice || null,
             priority: editPriority,
             status: editStatus,
             alternatives: cleanAlternatives(editAlternatives)
@@ -402,6 +408,23 @@ function formatItemStatusLabel(value?: GiftItemStatus | null) {
   }
 
   return "Active";
+}
+
+function formatEstimatedPrice(value: string | null) {
+  if (!value) {
+    return "No price";
+  }
+
+  const priceValue = Number(value);
+
+  if (Number.isNaN(priceValue)) {
+    return "No price";
+  }
+
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD"
+  }).format(priceValue);
 }
 
 function getItemStatusClass(value?: GiftItemStatus | null) {
@@ -626,6 +649,19 @@ const filteredGiftItems = getFilteredAndSortedGiftItems();
                 />
               </label>
 
+              <label className="compact-field">
+                Estimated price
+                <input
+                  type="number"
+                  value={estimatedPrice}
+                  onChange={(event) => setEstimatedPrice(event.target.value)}
+                  min={0}
+                  max={99999999.99}
+                  step="0.01"
+                  placeholder="0.00"
+                />
+              </label>
+
               <label className="compact-field compact-description">
                 Description
                 <textarea
@@ -804,6 +840,7 @@ const filteredGiftItems = getFilteredAndSortedGiftItems();
                     <th>Description</th>
                     <th>Priority</th>
                     <th>Qty</th>
+                    <th>Price</th>
                     <th>Link</th>
                     <th>Status</th>
                     <th>Actions</th>
@@ -819,7 +856,7 @@ const filteredGiftItems = getFilteredAndSortedGiftItems();
                     if (isEditing) {
                       return (
                         <tr className="gift-ideas-edit-row" key={item.id}>
-                          <td colSpan={7}>
+                          <td colSpan={8}>
                             <article className="gift-item-card editing">
                               <form
                                 className="item-edit-form"
@@ -882,6 +919,19 @@ const filteredGiftItems = getFilteredAndSortedGiftItems();
                                     min={1}
                                     max={99}
                                     required
+                                  />
+                                </label>
+
+                                <label>
+                                  Estimated price
+                                  <input
+                                    type="number"
+                                    value={editEstimatedPrice}
+                                    onChange={(event) => setEditEstimatedPrice(event.target.value)}
+                                    min={0}
+                                    max={99999999.99}
+                                    step="0.01"
+                                    placeholder="0.00"
                                   />
                                 </label>
 
@@ -1045,6 +1095,8 @@ const filteredGiftItems = getFilteredAndSortedGiftItems();
                         </td>
 
                         <td>{item.quantity}</td>
+
+                        <td>{formatEstimatedPrice(item.estimatedPrice)}</td>
 
                         <td>
                           {item.itemLink ? (

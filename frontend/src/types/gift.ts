@@ -23,6 +23,7 @@ export type GiftItem = {
   itemLink: string | null;
   itemDescription: string | null;
   quantity: number;
+  estimatedPrice: string | null;
   priority: GiftPriority;
   status: GiftItemStatus;
   isActive: boolean;

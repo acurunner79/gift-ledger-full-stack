@@ -251,6 +251,23 @@ function formatPriorityLabel(value?: GiftPriority | null) {
   return "Medium";
 }
 
+function formatEstimatedPrice(value: string | null) {
+  if (!value) {
+    return "No price";
+  }
+
+  const priceValue = Number(value);
+
+  if (Number.isNaN(priceValue)) {
+    return "No price";
+  }
+
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD"
+  }).format(priceValue);
+}
+
 function formatOccasionDate(value: string | null) {
   if (!value) {
     return null;
@@ -745,6 +762,8 @@ function getFilteredAndSortedGiftItems() {
                       </span>
 
                       <p>Quantity wanted: {item.quantity}</p>
+
+                      <p>Estimated price: {formatEstimatedPrice(item.estimatedPrice)}</p>
                     </div>
                   </div>
 

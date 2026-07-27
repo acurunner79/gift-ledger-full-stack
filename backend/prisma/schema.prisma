@@ -95,6 +95,7 @@ model GiftItem {
   itemLink        String?
   itemDescription String?
   quantity        Int               @default(1)
+  estimatedPrice  Decimal?          @db.Decimal(10, 2)
   priority        GiftPriority      @default(MEDIUM)
   status          GiftItemStatus    @default(ACTIVE)
   isActive        Boolean           @default(true)
